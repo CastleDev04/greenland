@@ -1,0 +1,27 @@
+export const navLink=[
+    {
+        id:1,
+        data:"Inicio",
+        link:"/"
+    },
+    {
+        id:2,
+        data:"Nosotros",
+        link:"#"
+    },
+    {
+        id:3,
+        data:"Propiedades",
+        link:"#"
+    },
+    {
+        id:4,
+        data:"Servicios",
+        link:"#"
+    },
+    {
+        id:5,
+        data:"Contacto",
+        link:"#"
+    }
+]
