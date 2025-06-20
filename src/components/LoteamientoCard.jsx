@@ -1,12 +1,12 @@
-import portada from "../image/portada.jpg"
+import portada from "../image/logo-lomas-country.jpg"
 
 
 export default function LoteamientoCard() {
     return(
         <>
-            <div className="w-80">
+            <div className="w-80 border-gray-300 border-2 rounded-2xl rounded-b-md shadow-lg hover:shadow-xl transition-shadow duration-300">
                 {/* Imagen de la loteadora */}
-                <img src={portada} alt="Imagen de loteadora" className="w-full h-54 rounded-t-2xl"/>
+                <img src={portada} alt="Imagen de loteadora" className="w-full h-54 rounded-t-2xl "/>
                 {/* Informacion de la loteadora */}
 
                 <div className="flex flex-col gap-4 p-4 bg-white">
@@ -22,13 +22,13 @@ export default function LoteamientoCard() {
                             <span>Ubicacion:</span>  Loma Grande
                         </p>
                         <p>
-                            <span>Disponibilidad:</span>  130 lotes
+                            <span>Disponible:</span>  133 lotes
                         </p>
                     </div>
                     {/* Precio estimado */}
                     <div className="flex justify-end items-end">
                         <p>
-                            Coutas Desde:1.000.000 Gs
+                            Precio:1.000.000 Gs
                         </p>
                     </div>
                 </div>

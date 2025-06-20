@@ -1,11 +1,11 @@
-import portada from "../image/portada.jpg"
+
 
 export default function PropiedadesCard(params) {
     return(
         <>
-                    <div className="w-80">
+                    <div className="w-80 border-gray-300 border-2 rounded-2xl rounded-b-md shadow-lg hover:shadow-xl transition-shadow duration-300">
                         {/* Imagen de la loteadora */}
-                        <img src={portada} alt="Imagen de loteadora" className="w-full h-54 rounded-t-2xl"/>
+                        <img src={params.imagen} alt="Imagen de loteadora" className="w-full h-56 rounded-t-2xl"/>
                         {/* Informacion de la loteadora */}
         
                         <div className="flex flex-col gap-4 p-4 bg-white">

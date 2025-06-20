@@ -1,5 +1,5 @@
 import { LuSearch } from "react-icons/lu";
-import portada from "../image/portada.jpg";
+import portada from "../image/portada-greenland.jpg";
 export default function Hero() {
     return(
         <>

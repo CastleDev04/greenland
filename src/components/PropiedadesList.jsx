@@ -1,19 +1,25 @@
 import PropiedadesCard from './PropiedadesCard.jsx';
+import Casa from "../image/casa-lomas-country.jpg";
+
+
 
 export default function PropiedadesList() {
     const Lotes=[{
-        titulo: "Las Lomas Country",
+        imagen: "../image/casa-lomas-country.jpg",
+        titulo: "Las Lomas Country - Casa",
         ubicacion: "Loma Grande",
-        superficie: "500 m²",
-        precio: "1.000.000"
+        superficie: "57 m²",
+        precio: "280.000.000"
     }, {
-        titulo: "Parque del Sol",
-        ubicacion: "Ciudad del Este",
-        superficie: "600 m²",
+        imagen: "../image/imagen-lomas-country-barrio1.jpg",
+        titulo: "Las Lomas Country - Terreno",
+        ubicacion: "Loma Grande",
+        superficie: "57 m²",
         precio: "1.200.000"
     }, {
-        titulo: "Valle Verde",
-        ubicacion: "Asunción",
+        imagen: "../image/imagen-lomas-country-barrio2.jpg",
+        titulo: "Las Lomas Country - Terreno",
+        ubicacion: "Loma Grande",
         superficie: "700 m²",
         precio: "1.500.000"
     }]
@@ -27,6 +33,7 @@ export default function PropiedadesList() {
                     {Lotes.map((lote, index) => (
                         <PropiedadesCard 
                             key={index}
+                            imagen={lote.imagen}
                             titulo={lote.titulo} 
                             ubicacion={lote.ubicacion} 
                             superficie={lote.superficie} 
