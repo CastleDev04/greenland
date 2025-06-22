@@ -19,8 +19,8 @@ export default function Foter() {
                 CONTACTO 
               </h2>
               <div >
-                <div className="flex gap-4"><BsFillTelephoneFill /> <p>0981 234233</p></div>
-                <div className="flex gap-4"><BsFillTelephoneFill /> <p>0982 640741</p></div>
+                <div className="flex gap-4 justify-center items-center"><BsFillTelephoneFill /> <p>0981 234233</p></div>
+                <div className="flex gap-4 justify-center items-center"><BsFillTelephoneFill /> <p>0982 640741</p></div>
               </div>
             </div>
           {/* Seccion de Redes Sociales */}
@@ -39,7 +39,7 @@ export default function Foter() {
         </div>
         {/* Seccion de footer pie de pagina */}
         <div className="bg-green-700">
-
+          
         </div>
       </div>
     </>

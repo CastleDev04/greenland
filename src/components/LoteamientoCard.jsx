@@ -1,5 +1,6 @@
 import portada from "../image/logo-lomas-country.jpg"
-
+import { BsCurrencyDollar, BsCardList  } from "react-icons/bs";
+import { FiMapPin } from "react-icons/fi";
 
 export default function LoteamientoCard() {
     return(
@@ -18,17 +19,18 @@ export default function LoteamientoCard() {
                     </div>
                     {/* Informacion sobre lote (Ubicacion y disponibilida) */}
                     <div className="flex flex-col gap-2">
-                        <p>
-                            <span>Ubicacion:</span>  Loma Grande
+                        <p className="flex items-center gap-3 text-xl text-gray-800">
+                            <span className="flex gap-2 items-center text-2xl font-bolt text-gray-950"><FiMapPin />Ubicacion:</span>  Loma Grande
                         </p>
-                        <p>
-                            <span>Disponible:</span>  133 lotes
+                        <p className="flex items-center gap-3 text-xl text-gray-800">
+                            <span className="flex gap-2 items-center text-2xl font-bolt text-gray-950"><BsCardList />Disponible:</span>  133 lotes
                         </p>
                     </div>
                     {/* Precio estimado */}
                     <div className="flex justify-end items-end">
-                        <p>
-                            Precio:1.000.000 Gs
+                        <p className="flex items-center gap-3 text-xl text-gray-800">
+                            <span className="flex gap-2 items-center text-2xl font-bolt text-gray-950"><BsCurrencyDollar />Precio:</span>
+                            1.000.000 Gs
                         </p>
                     </div>
                 </div>

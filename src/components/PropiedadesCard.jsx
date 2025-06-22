@@ -1,3 +1,5 @@
+import { FiMapPin } from "react-icons/fi";
+import { BsCurrencyDollar, BsSuperscript } from "react-icons/bs";
 
 
 export default function PropiedadesCard(params) {
@@ -17,17 +19,17 @@ export default function PropiedadesCard(params) {
                             </div>
                             {/* Informacion sobre lote (Ubicacion y disponibilida) */}
                             <div className="flex flex-col gap-2">
-                                <p>
-                                    <span>Ubicacion:</span>  {params.ubicacion}
+                                <p className="flex items-center gap-3 text-xl text-gray-800">
+                                    <span className="flex gap-2 items-center text-2xl font-bolt text-gray-950"><FiMapPin />Ubicacion:</span>  {params.ubicacion}
                                 </p>
-                                <p>
-                                    <span>Superficie:</span>  {params.superficie}
+                                <p className="flex items-center gap-3 text-xl text-gray-800">
+                                    <span className="flex gap-2 items-center text-2xl font-bolt text-gray-950"><BsSuperscript />Superficie:</span>  {params.superficie}
                                 </p>
                             </div>
                             {/* Precio estimado */}
                             <div className="flex justify-end items-end">
-                                <p>
-                                    <span>Coutas Desde:</span> {params.precio} Gs
+                                <p className="flex items-center gap-3 text-xl text-gray-800">
+                                    <span className="flex gap-2 items-center text-2xl font-bolt text-gray-950"><BsCurrencyDollar />Precio:</span> {params.precio} Gs
                                 </p>
                             </div>
                         </div>
