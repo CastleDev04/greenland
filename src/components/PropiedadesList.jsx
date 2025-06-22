@@ -1,7 +1,7 @@
 import PropiedadesCard from './PropiedadesCard.jsx';
 import Casa from "../image/casa-lomas-country.jpg";
-
-
+import Barrio from "../image/imagen-lomas-country-barrio1.jpg";
+import Barrio2 from "../image/imagen-lomas-country-barrio2.jpg";
 
 export default function PropiedadesList() {
     const Lotes=[{
@@ -15,13 +15,13 @@ export default function PropiedadesList() {
         titulo: "Las Lomas Country - Terreno",
         ubicacion: "Loma Grande",
         superficie: "57 m²",
-        precio: "1.200.000"
+        precio: "92.400.000"
     }, {
         imagen: "../image/imagen-lomas-country-barrio2.jpg",
         titulo: "Las Lomas Country - Terreno",
         ubicacion: "Loma Grande",
-        superficie: "700 m²",
-        precio: "1.500.000"
+        superficie: "57 m²",
+        precio: "99.000.000"
     }]
     return(
         <>
@@ -30,16 +30,36 @@ export default function PropiedadesList() {
                     <h2 className="text-3xl font-bold">Propiedades Destacadas</h2>
                 </div>
                 <div className="flex gap-22 items-center justify-around">
-                    {Lotes.map((lote, index) => (
+                    {
                         <PropiedadesCard 
-                            key={index}
-                            imagen={lote.imagen}
-                            titulo={lote.titulo} 
-                            ubicacion={lote.ubicacion} 
-                            superficie={lote.superficie} 
-                            precio={lote.precio} 
+                            key={0}
+                            imagen={Casa}
+                            titulo={Lotes[0].titulo} 
+                            ubicacion={Lotes[0].ubicacion} 
+                            superficie={Lotes[0].superficie} 
+                            precio={Lotes[0].precio} 
                         />
-                    ))}
+                    }
+                    {
+                        <PropiedadesCard 
+                            key={1}
+                            imagen={Barrio}
+                            titulo={Lotes[1].titulo} 
+                            ubicacion={Lotes[1].ubicacion} 
+                            superficie={Lotes[1].superficie} 
+                            precio={Lotes[1].precio} 
+                        />
+                    }
+                    {
+                        <PropiedadesCard 
+                            key={2}
+                            imagen={Barrio2}
+                            titulo={Lotes[2].titulo} 
+                            ubicacion={Lotes[2].ubicacion} 
+                            superficie={Lotes[2].superficie} 
+                            precio={Lotes[2].precio} 
+                        />
+                    }
                 </div>
             </div>
         </>

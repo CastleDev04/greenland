@@ -1,63 +1,47 @@
-
-"use client";
-
-import { Footer } from "flowbite-react";
-import {
-  FooterBrand,
-  FooterCopyright,
-  FooterDivider,
-  FooterIcon,
-  FooterLink,
-  FooterLinkGroup,
-  FooterTitle,
-} from "flowbite-react";
-import { BsDribbble, BsFacebook, BsGithub, BsInstagram, BsTwitter } from "react-icons/bs";
+import Logo from "../image/Logo.png"
+import { BsFillTelephoneFill, BsFacebook, BsTiktok, BsInstagram, BsTwitter } from "react-icons/bs";
 
 export default function Foter() {
   return (
-    <Footer container>
-      <div className="w-full">
-        <div className="grid w-full justify-between sm:flex sm:justify-between md:flex md:grid-cols-1">
-          <div>
-            <FooterBrand
-              href="#"
-              src="../image/Logo.png"
-              alt="Green Land Logo"
-              name="Green Land"
-            />
+    <>
+      <div>
+        {/* seccion de footer  */}
+        <div className="bg-green-600 p-5 flex justify-between px-14 w-full">
+          <div className="flex gap-2 items-center">
+            <img src={Logo} alt="logo lomas country" className="w-16 h-16" />
+            <h2 className="text-2xl font-bolt">GREEN LAND</h2>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:mt-4 sm:grid-cols-3 sm:gap-6">
-            <div>
-              <FooterTitle title="about" />
-              <FooterLinkGroup col>
-                <FooterLink href="#">GREEN LAND</FooterLink>
-              </FooterLinkGroup>
+
+          <div className="flex justify-around gap-12">
+          {/* Seccion Contacto */}
+            <div className="flex flex-col justify-center items-center gap-5">
+              <h2 className="text-2xl font-bolt">
+                CONTACTO 
+              </h2>
+              <div >
+                <div className="flex gap-4"><BsFillTelephoneFill /> <p>0981 234233</p></div>
+                <div className="flex gap-4"><BsFillTelephoneFill /> <p>0982 640741</p></div>
+              </div>
             </div>
-            <div>
-              <FooterTitle title="Follow us" />
-              <FooterLinkGroup col>
-                <FooterLink href="#">Instagram</FooterLink>
-                <FooterLink href="#">TikTok</FooterLink>
-              </FooterLinkGroup>
+          {/* Seccion de Redes Sociales */}
+            <div className="flex flex-col justify-center items-center gap-5">
+              <h2 className="text-2xl font-bolt">
+                SIGUENOS
+              </h2>
+              <div className="flex gap-9 text-3xl">
+                <a href=""><BsInstagram /></a>
+                <a href=""><BsFacebook /></a>
+                <a href=""><BsTiktok /></a>
+              </div>
             </div>
-            <div>
-              <FooterTitle title="Legal" />
-              <FooterLinkGroup col>
-                <FooterLink href="#">Privacy Policy</FooterLink>
-                <FooterLink href="#">Terms &amp; Conditions</FooterLink>
-              </FooterLinkGroup>
-            </div>
+
           </div>
         </div>
-        <FooterDivider />
-        <div className="w-full sm:flex sm:items-center sm:justify-between">
-          <FooterCopyright href="#" by="Green Land™" year={2025} />
-          <div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
-            <FooterIcon href="#" icon={BsFacebook} />
-            <FooterIcon href="#" icon={BsInstagram} />
-          </div>
+        {/* Seccion de footer pie de pagina */}
+        <div className="bg-green-700">
+
         </div>
       </div>
-    </Footer>
+    </>
   );
 }
