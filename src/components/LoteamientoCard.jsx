@@ -20,16 +20,16 @@ export default function LoteamientoCard() {
                     {/* Informacion sobre lote (Ubicacion y disponibilida) */}
                     <div className="flex flex-col gap-2">
                         <p className="flex items-center gap-3 text-xl text-gray-800">
-                            <span className="flex gap-2 items-center text-2xl font-bolt text-gray-950"><FiMapPin />Ubicacion:</span>  Loma Grande
+                            <span className="flex gap-2 items-center text-xl font-bolt text-gray-950"><FiMapPin />Ubicacion:</span>  Loma Grande
                         </p>
                         <p className="flex items-center gap-3 text-xl text-gray-800">
-                            <span className="flex gap-2 items-center text-2xl font-bolt text-gray-950"><BsCardList />Disponible:</span>  133 lotes
+                            <span className="flex gap-2 items-center text-xl font-bolt text-gray-950"><BsCardList />Disponible:</span>  133 lotes
                         </p>
                     </div>
                     {/* Precio estimado */}
                     <div className="flex justify-end items-end">
                         <p className="flex items-center gap-3 text-xl text-gray-800">
-                            <span className="flex gap-2 items-center text-2xl font-bolt text-gray-950"><BsCurrencyDollar />Precio:</span>
+                            <span className="flex gap-2 items-center text-xl font-bolt text-gray-950"><BsCurrencyDollar />Precio:</span>
                             1.000.000 Gs
                         </p>
                     </div>
