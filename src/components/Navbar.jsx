@@ -1,21 +1,21 @@
 import Logo from "../image/Logo.png"
 import { LuCircleDollarSign } from "react-icons/lu";
 
-import { BsPersonCircle } from "react-icons/bs";
+import { BsPersonCircle, BsList } from "react-icons/bs";
 
 export default function Navbar() {
     
     return(
         <>
             <nav>
-                <div className="flex justify-between items-center py-4 px-2 bg-ambar-200 ">
+                <div className="flex justify-between items-center py-4 md:px-2 bg-ambar-200 ">
                     {/*Logo section*/}
                     <div className="flex items-center">
 
-                        <img src={Logo} alt="Logo  greenland" className="h-16 w-16 "/>
+                        <img src={Logo} alt="Logo  greenland" className="w-11 h-11 md:h-16 md:w-16 "/>
                         <div >
-                            <h1 className="text-4xl font-medium">GREEN LAND</h1>
-                            <p className="font-normal">Emprendimientos & Inversiones</p>
+                            <h1 className="text-2xl md:text-4xl font-medium">GREEN LAND</h1>
+                            <p className="text-sm md:font-normal">Emprendimientos & Inversiones</p>
                         </div>
                     </div>
                     {/*Menu section*/}
@@ -55,7 +55,7 @@ export default function Navbar() {
                     </div>
                     
                     {/*Icon section*/}
-                    <div className="flex gap-5 ">
+                    <div className="hidden md:flex gap-5 ">
                         {/* <button className="flex bg-gray-200 w-32 h-12 cursor-pointer hover:bg-gray-100 rounded-xl justify-center text-xl font-bolt text-center gap-3 items-center px-3">
                             <LuSearch /> Buscar
                         </button> */}
@@ -67,6 +67,11 @@ export default function Navbar() {
                         </button>
                     </div>
                     {/*Mobile hamburguer menu section*/}
+                    <div className="md:hidden flex items-center p-2">
+                            <button className="text-4xl">
+                                <BsList/>
+                            </button>
+                    </div>
                 </div>
             </nav>
 
