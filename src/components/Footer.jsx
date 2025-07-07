@@ -4,7 +4,7 @@ import { BsFillTelephoneFill, BsFacebook, BsTiktok, BsInstagram, BsTwitter } fro
 export default function Foter() {
   return (
     <>
-      <div className="">
+      <div className="font-body">
         {/* seccion de footer  */}
         <div className="bg-green-600 p-5 flex flex-wrap justify-between w-full">
           <div className="flex gap-2 items-center">

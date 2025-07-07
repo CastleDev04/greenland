@@ -28,7 +28,7 @@ export default function PropiedadesList() {
         <>
             <div className="flex flex-col justify-center items-center gap-16 bg-green-300 md:p-8">
                 <div>
-                    <h2 className="text-center text-3xl font-bold">Propiedades Destacadas</h2>
+                    <h2 className="text-center text-3xl font-bold font-display">Propiedades Destacadas</h2>
                 </div>
                 <div className="hidden md:flex flex-wrap gap-22 items-center justify-around">
                     {

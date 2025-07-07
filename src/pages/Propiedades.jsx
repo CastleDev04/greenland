@@ -34,7 +34,7 @@ export default function Propiedades() {
                     </MapContainer>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-5">
-                    <h1 className="text-4xl">Propiedades</h1>
+                    <h1 className="font-display text-4xl">Propiedades</h1>
                     <LoteamientoCard></LoteamientoCard>
                     <h2 className='text-5xl font-black'>Proximamente Listado de Propiedade Aqui</h2>
                 </div> 

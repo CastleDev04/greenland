@@ -6,4 +6,13 @@ import flowbiteReact from "flowbite-react/plugin/vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [tailwindcss(), react(), flowbiteReact()],
+  
+  theme: {
+    extend: {
+      fontFamily: {
+        display: ['"Playfair Display"', 'serif'],
+        body: ['Poppins', 'sans-serif'],
+      },
+    },
+  },
 })

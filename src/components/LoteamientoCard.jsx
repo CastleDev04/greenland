@@ -2,10 +2,12 @@ import portada from "../image/logo-lomas-country.jpg"
 import { BsCurrencyDollar, BsCardList  } from "react-icons/bs";
 import { FiMapPin } from "react-icons/fi";
 
+import { Link } from "react-router-dom";
+
 export default function LoteamientoCard() {
     return(
         <>
-            <div className="w-64 md:w-80 border-gray-300 border-2 rounded-2xl rounded-b-md shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="font-body w-64 md:w-80 border-gray-300 border-2 rounded-2xl rounded-b-md shadow-lg hover:shadow-xl transition-shadow duration-300">
                 {/* Imagen de la loteadora */}
                 <img src={portada} alt="Imagen de loteadora" className="w-full h-48 md:h-54 rounded-t-2xl "/>
                 {/* Informacion de la loteadora */}
@@ -13,7 +15,7 @@ export default function LoteamientoCard() {
                 <div className="flex flex-col gap-4 p-4 bg-white">
                     {/* Titulo */}
                     <div className="w-full flex justify-center items-center">
-                        <h2 className="md:text-2xl font-bold text-center">
+                        <h2 className="font-display md:text-2xl font-bold text-center">
                             Las Lomas Country
                         </h2>
                     </div>
@@ -34,7 +36,9 @@ export default function LoteamientoCard() {
                         </p>
                     </div>
                 </div>
-                <button className="w-full bg-green-400 md:text-xl rounded-b-md p-1.5 hover:bg-green-200">Ver Contacto</button>
+                <Link to="/contacto" className="font-body w-full">
+                    <button className="w-full bg-green-400 md:text-xl rounded-b-md p-1.5 hover:bg-green-200">Ver Contacto</button>
+                </Link>
             </div>
         </>
     )

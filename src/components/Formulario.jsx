@@ -31,8 +31,8 @@ export default function Formulario() {
   };
 
   return (
-    <section className="bg-white ">
-      <h2 className="text-xl font-bold  text-center text-gray-800">Contáctanos</h2>
+    <section className="font-body bg-white ">
+      <h2 className="md:text-xl font-display font-bold  text-center text-gray-800">Contáctanos</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {/* Nombre */}
@@ -46,7 +46,7 @@ export default function Formulario() {
             value={form.name}
             onChange={handleChange}
             required
-            className="mt-1 block w-full border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mt-1 block w-full border border-gray-300 md:px-4 md:py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
         </div>
         <div>
@@ -59,7 +59,7 @@ export default function Formulario() {
                 value={form.email}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm md:px-4 md:py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
         </div>
           
@@ -76,7 +76,7 @@ export default function Formulario() {
             value={form.subject}
             onChange={handleChange}
             required
-            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm md:px-4 md:py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -90,7 +90,7 @@ export default function Formulario() {
             value={form.message}
             onChange={handleChange}
             required
-            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-14"
+            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm md:px-4 md:py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-14"
           ></textarea>
         </div>
 
