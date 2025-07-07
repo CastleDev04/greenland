@@ -33,7 +33,7 @@ export default function PropiedadesCard(params) {
                                 </p>
                             </div>
                         </div>
-                        <button className="w-full bg-green-400 text-xl md:rounded-b-md p-1.5 hover:bg-green-200">Ver Loteamiento</button>
+                        <button className="w-full bg-green-400 text-xl md:rounded-b-md p-1.5 hover:bg-green-200">Ver Contacto</button>
                     </div>
                 </>
     )

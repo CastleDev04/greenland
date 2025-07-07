@@ -1,10 +1,14 @@
 import Logo from "../image/Logo.png"
+import { Outlet, Link } from "react-router-dom";
 import { LuCircleDollarSign } from "react-icons/lu";
-
+import { useState } from 'react';
 import { BsPersonCircle, BsList } from "react-icons/bs";
 
 export default function Navbar() {
-    
+    const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => setIsOpen(!isOpen);
+
     return(
         <>
             <nav>
@@ -22,33 +26,33 @@ export default function Navbar() {
                     <div className="hidden md:block">
                         <ul className="flex text-xl item-center gap-5 text-gray-600">
                                 <li >
-                                    <a href="" className="inline-block py-1 px-3 hover:text-gray-200 font-semibolt ">
+                                    <Link to="/"  className="inline-block py-1 px-3 hover:text-gray-200 font-semibolt ">
                                         Inicio
-                                    </a>
+                                    </Link>
                                     
                                 </li>
                                 <li >
-                                    <a href="" className="inline-block py-1 px-3 hover:text-gray-200 font-semibolt ">
+                                    <Link to="/nosotros"  className="inline-block py-1 px-3 hover:text-gray-200 font-semibolt ">
                                         Nosotros
-                                    </a>
+                                    </Link>
                                     
                                 </li>
                                 <li >
-                                    <a href="" className="inline-block py-1 px-3 hover:text-gray-200 font-semibolt ">
+                                    <Link to="/servicios"  className="inline-block py-1 px-3 hover:text-gray-200 font-semibolt ">
                                         Servicios
-                                    </a>
+                                    </Link>
                                     
                                 </li>
                                 <li >
-                                    <a href="" className="inline-block py-1 px-3 hover:text-gray-200 font-semibolt ">
+                                    <Link to="/propiedades"  className="inline-block py-1 px-3 hover:text-gray-200 font-semibolt ">
                                         Propiedades
-                                    </a>
+                                    </Link >
                                     
                                 </li>
                                 <li >
-                                    <a href="" className="inline-block py-1 px-3 hover:text-gray-200 font-semibolt ">
+                                    <Link to="/contacto"  className="inline-block py-1 px-3 hover:text-gray-200 font-semibolt ">
                                         Contacto
-                                    </a>
+                                    </Link>
                                     
                                 </li>
                         </ul>
@@ -68,14 +72,27 @@ export default function Navbar() {
                     </div>
                     {/*Mobile hamburguer menu section*/}
                     <div className="md:hidden flex items-center p-2">
-                            <button className="text-4xl">
+                            <button onClick={toggleMenu} className="text-4xl text-gray-800 focus:outline-none">
                                 <BsList/>
                             </button>
                     </div>
                 </div>
             </nav>
+            {/* Menú desplegable */}
+            {isOpen && (
+            <div className="absolute top-16 left-0 w-full bg-white shadow-lg z-50">
+                <nav className="flex flex-col space-y-4 p-4 text-lg text-gray-700">
+                    <Link to="/" onClick={toggleMenu} className="hover:text-blue-600">Inicio</Link>
+                    <Link to="/nosotros" onClick={toggleMenu} className="hover:text-blue-600">Nosotros</Link>
+                    <Link to="/servicios" onClick={toggleMenu} className="hover:text-blue-600">Servicios</Link>
+                    <Link to="/propiedades" onClick={toggleMenu} className="hover:text-blue-600">Propiedades</Link>
+                    <Link to="/contacto" onClick={toggleMenu} className="hover:text-blue-600">Contacto</Link>
+                </nav>
+            </div>
+            )}
 
-            {/*Mobile sidebar section*/}
+            <Outlet/>
+
         </>
     )
 };

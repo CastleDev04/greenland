@@ -30,11 +30,11 @@ export default function LoteamientoCard() {
                     <div className="flex justify-end items-end">
                         <p className="flex items-center gap-3 md:text-xl text-gray-800">
                             <span className="flex gap-2 items-center md:text-xl font-bold text-gray-950"><BsCurrencyDollar />Precio:</span>
-                            1.000.000 Gs
+                            280.000.000 Gs
                         </p>
                     </div>
                 </div>
-                <button className="w-full bg-green-400 md:text-xl rounded-b-md p-1.5 hover:bg-green-200">Ver Loteamiento</button>
+                <button className="w-full bg-green-400 md:text-xl rounded-b-md p-1.5 hover:bg-green-200">Ver Contacto</button>
             </div>
         </>
     )

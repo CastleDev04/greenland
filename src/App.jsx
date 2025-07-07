@@ -1,24 +1,28 @@
 import './App.css'
-
+import ReactDOM from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar"
-import Hero from "./components/Hero"
-import LoteamientoList from "./components/LoteamientoList"
-import PropiedadesList from "./components/PropiedadesList"
-import Foter from "./components/Footer"
+import Index from "./pages/index.jsx"
+import Nosotros from "./pages/Nosotros.jsx"
+import Servicios from "./pages/Servicios.jsx"
+import Propiedades from "./pages/Propiedades.jsx"
+import Contacto from "./pages/Contacto.jsx"
 
 function App() {
 
   return (
     <>
-      <div className="overflow-x-hidden">
-        <Navbar></Navbar>
-      </div>
-      <div className="flex flex-col gap-24">
-        <Hero></Hero>
-        <LoteamientoList/>
-        <PropiedadesList/>
-        <Foter></Foter>
-      </div>
+      <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navbar />}>
+          <Route index element={<Index />} />
+          <Route path="nosotros" element={<Nosotros />} />
+          <Route path="servicios" element={<Servicios />} />
+          <Route path="propiedades" element={<Propiedades />} />
+          <Route path="contacto" element={<Contacto />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
     </>
   )
 }
