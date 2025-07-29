@@ -1,109 +1,65 @@
-import { useState } from 'react';
+import React, { useRef } from 'react';
+import emailjs from '@emailjs/browser';
 
-export default function Formulario() {
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
+export default function Formulario(){
+  const form = useRef();
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
+  const sendEmail = (e) => {
     e.preventDefault();
 
-    // Aquí podés conectar con tu backend o servicio externo
-    console.log('Formulario enviado:', form);
-
-    // Resetear formulario (opcional)
-    setForm({
-      name: '',
-      email: '',
-      subject: '',
-      message: ''
-    });
+    emailjs
+      .sendForm('service_rr1xnzg', 'template_jz3o1va', form.current, {
+        publicKey: 'dfKGZy2pLAKG9ITiK',
+      })
+      .then(
+        () => {
+          console.log('SUCCESS!');
+        },
+        (error) => {
+          console.log('FAILED...', error.text);
+        },
+      );
   };
 
   return (
-    <section className="font-body bg-white ">
-      <h2 className="md:text-xl font-display font-bold  text-center text-gray-800">Contáctanos</h2>
+    <form ref={form} onSubmit={sendEmail} className="flex flex-col gap-4 w-full max-w-md mx-auto p-4">
+      <label className="font-semibold">Name</label>
+      <input
+        type="text"
+        name="user_name"
+        className="border p-2 rounded"
+        required
+      />
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {/* Nombre */}
-        <div className='flex gap-2'>
-            <div>
-                <label htmlFor="name" className=" text-sm font-medium text-gray-700">Nombre completo</label>
-                <input
-            type="text"
-            id="name"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full border border-gray-300 md:px-4 md:py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-        </div>
-        <div>
-                {/* Email */}
-                <label htmlFor="email" className="text-sm font-medium text-gray-700">Correo electrónico</label>
-                <input
-                type="email"
-                id="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm md:px-4 md:py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-        </div>
-          
-             
-        </div>
+      <label className="font-semibold">Email</label>
+      <input
+        type="email"
+        name="user_email"
+        className="border p-2 rounded"
+        required
+      />
 
-        {/* Asunto */}
-        <div>
-          <label htmlFor="subject" className="block text-sm font-medium text-gray-700">Asunto</label>
-          <input
-            type="text"
-            id="subject"
-            name="subject"
-            value={form.subject}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm md:px-4 md:py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+      <label className="font-semibold">Subject</label>
+      <input
+        type="text"
+        name="subject"
+        className="border p-2 rounded"
+        required
+      />
 
-        {/* Mensaje */}
-        <div>
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700">Mensaje</label>
-          <textarea
-            id="message"
-            name="message"
-            rows="5"
-            value={form.message}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm md:px-4 md:py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-14"
-          ></textarea>
-        </div>
+      <label className="font-semibold">Message</label>
+      <textarea
+        name="message"
+        className="border p-2 rounded"
+        required
+      />
 
-        {/* Botón */}
-        <div className="text-center">
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Enviar mensaje
-          </button>
-        </div>
-      </form>
-    </section>
+      <input
+        type="submit"
+        value="Send"
+        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 cursor-pointer"
+      />
+    </form>
   );
-}
+};
+  

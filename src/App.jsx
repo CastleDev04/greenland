@@ -2,6 +2,7 @@ import './App.css'
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar"
+import WhatsAppButton from "./components/WhaatsAppButton"
 import Index from "./pages/index.jsx"
 import Nosotros from "./pages/Nosotros.jsx"
 import Servicios from "./pages/Servicios.jsx"
@@ -23,6 +24,7 @@ function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    <WhatsAppButton />
     </>
   )
 }

@@ -6,7 +6,7 @@ export default function Contacto() {
     return(
         <div >
             <div className="flex flex-col md:flex-row font-body items-center justify-center ">
-                <div className='flex flex-col items-center  p-5 justify-center bg-green-200 gap-5 w-100 h-98 rounded-bl-2xl rounded-tl-2xl'>
+                <div className='flex flex-col items-center  p-5 justify-center bg-green-200 gap-5 w-100 h-136 rounded-bl-2xl rounded-tl-2xl'>
                     <h2 className='text-2xl font-bold font-display'>Información de contacto</h2>
                     <p className='text-left md:text-center'>Puede comunicarte con nosotros a través de los siguientes medios. O puedes escribir tu mensaje directamente en el formulario.</p>
                     <ul className='flex flex-col items-center justify-center gap-2 text-sm md:text-lg'>
