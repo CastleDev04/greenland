@@ -66,9 +66,12 @@ export default function Navbar() {
                         <button className=" font-body flex bg-gray-200 w-42 h-12 cursor-pointer hover:bg-gray-100  rounded-xl justify-center text-xl font-bolt text-center gap-3 items-center px-3">
                             <LuCircleDollarSign /> Mis Pagos
                         </button>
-                        <button className=" font-body flex bg-blue-700 w-32 h-12 cursor-pointer hover:bg-blue-600 rounded-xl justify-center text-xl font-bolt text-center gap-3 items-center px-3">
-                            <BsPersonCircle /> Acceder
-                        </button>
+                        <Link to="/login"  className=" font-body inline-block py-1 px-3 hover:text-gray-200 font-semibolt ">
+                            <button className=" font-body flex bg-blue-700 w-32 h-12 cursor-pointer hover:bg-blue-600 rounded-xl justify-center text-xl font-bolt text-center gap-3 items-center px-3">
+                                <BsPersonCircle /> Acceder
+                            </button>
+                        </Link>
+                        
                     </div>
                     {/*Mobile hamburguer menu section*/}
                     <div className=" font-body md:hidden flex items-center p-2">
