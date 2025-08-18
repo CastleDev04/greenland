@@ -82,17 +82,24 @@ export default function Navbar() {
                 </div>
             </nav>
             {/* Menú desplegable */}
-            {isOpen && (
-            <div className=" font-body absolute top-16 left-0 w-full bg-white shadow-lg z-50">
-                <nav className="flex flex-col space-y-4 p-4 text-lg text-gray-700">
-                    <Link to="/" onClick={toggleMenu} className="hover:text-blue-600">Inicio</Link>
-                    <Link to="/nosotros" onClick={toggleMenu} className="hover:text-blue-600">Nosotros</Link>
-                    <Link to="/servicios" onClick={toggleMenu} className="hover:text-blue-600">Servicios</Link>
-                    <Link to="/propiedades" onClick={toggleMenu} className="hover:text-blue-600">Propiedades</Link>
-                    <Link to="/contacto" onClick={toggleMenu} className="hover:text-blue-600">Contacto</Link>
-                </nav>
-            </div>
-            )}
+{isOpen && (
+  <div className="font-body absolute top-16 left-0 w-full bg-white shadow-lg z-50">
+    <nav className="flex flex-col space-y-4 p-4 text-lg text-gray-700">
+      <Link to="/" onClick={toggleMenu} className="hover:text-blue-600">Inicio</Link>
+      <Link to="/nosotros" onClick={toggleMenu} className="hover:text-blue-600">Nosotros</Link>
+      <Link to="/servicios" onClick={toggleMenu} className="hover:text-blue-600">Servicios</Link>
+      <Link to="/propiedades" onClick={toggleMenu} className="hover:text-blue-600">Propiedades</Link>
+      <Link to="/contacto" onClick={toggleMenu} className="hover:text-blue-600">Contacto</Link>
+
+      {/* Botón Acceder en mobile */}
+      <Link to="/login" onClick={toggleMenu}>
+        <button className="flex bg-blue-700 w-full h-12 cursor-pointer hover:bg-blue-600 rounded-xl justify-center text-xl font-bolt text-center gap-3 items-center px-3 text-white">
+          <BsPersonCircle /> Acceder
+        </button>
+      </Link>
+    </nav>
+  </div>
+)}
 
             <Outlet/>
 

@@ -24,15 +24,15 @@ function App() {
       case 'propiedades':
         return <PropiedadesSection/>;
       case 'ventas':
-        return <h1>Hola</h1>;
+        return <h1>Seccion de ventas</h1>;
       case 'pagos':
-        return <h1>Hola</h1>;
+        return <h1>Seccion de Pagos</h1>;
       case 'reportes':
-        return <h1>Hola</h1>;
+        return <h1>Seccion de reportes</h1>;
       case 'usuarios':
-        return <h1>Hola</h1>;
+        return <h1>Seccion de usuarios</h1>;
       default:
-        return <h1>Hola</h1>;
+        return <PropiedadesSection/>;
     }
   };
 
