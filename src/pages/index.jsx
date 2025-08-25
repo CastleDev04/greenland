@@ -13,7 +13,7 @@ export default function Index() {
             <div className="flex flex-col gap-24">
                 <Hero></Hero>
                 <LoteamientoList/>
-                <PromocionSection />
+                {/* <PromocionSection /> */}
                 <PropiedadesList/>
                 <Foter></Foter>
             </div>
