@@ -19,8 +19,14 @@ export default function PropiedadesList() {
             const res = await fetch(`https://backend-greenland.onrender.com/api/propiedades`);
             if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
             const datos = await res.json();
+            // Filtrar solo propiedades al contado
+            const propiedadesContado = datos.filter(propiedad => 
+                propiedad.modalidadPago && 
+                propiedad.modalidadPago.toLowerCase() === 'contado'
+            );
+            
             // Limitar a máximo 6 propiedades
-            setLotes(datos.slice(0, 6));
+            setLotes(propiedadesContado.slice(0, 6));
         } catch (error) {
             console.error('Error loading propiedades:', error);
             setError(error.message);
