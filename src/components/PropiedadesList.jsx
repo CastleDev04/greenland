@@ -11,6 +11,8 @@ export default function PropiedadesList() {
     const [error, setError] = useState(null);
     const [currentSlide, setCurrentSlide] = useState(0);
 
+    const precios = [148959800,141699800,134439800,1269598000]
+
     // Función para cargar propiedades
     const loadPropiedades = async () => {
         try {
@@ -30,7 +32,7 @@ export default function PropiedadesList() {
     );
     
     // Limitar a máximo 6 propiedades
-    setLotes(propiedadesFiltradas.slice(0, 6));
+    setLotes(propiedadesFiltradas.slice(0, 4));
         } catch (error) {
             console.error('Error loading propiedades:', error);
             setError(error.message);
@@ -165,7 +167,7 @@ export default function PropiedadesList() {
                                     titulo={lote.loteamiento || lote.titulo} 
                                     ubicacion={lote.distrito || lote.ubicacion} 
                                     superficie={lote.superficie} 
-                                    precio={lote.precioTotal} 
+                                    precio={lote.precioTotal > 100000000 ? lote.precioTotal : precios[index]} 
                                 />
                             </div>
                         ))}
@@ -187,7 +189,7 @@ export default function PropiedadesList() {
                                                 titulo={lote.loteamiento || lote.titulo} 
                                                 ubicacion={lote.distrito || lote.ubicacion} 
                                                 superficie={lote.superficie} 
-                                                precio={lote.precioTotal || lote.precio} 
+                                                precio={lote.precioTotal > 100000000 ? lote.precioTotal : precios[index]} 
                                             />
                                         </div>
                                     ))}
