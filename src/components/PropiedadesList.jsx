@@ -167,7 +167,7 @@ export default function PropiedadesList() {
                                     titulo={lote.loteamiento || lote.titulo} 
                                     ubicacion={lote.distrito || lote.ubicacion} 
                                     superficie={lote.superficie} 
-                                    precio={lote.precioTotal > 100000000 ? lote.precioTotal : precios[index]} 
+                                    precio={precios[index]} 
                                 />
                             </div>
                         ))}
@@ -189,7 +189,7 @@ export default function PropiedadesList() {
                                                 titulo={lote.loteamiento || lote.titulo} 
                                                 ubicacion={lote.distrito || lote.ubicacion} 
                                                 superficie={lote.superficie} 
-                                                precio={lote.precioTotal > 100000000 ? lote.precioTotal : precios[index]} 
+                                                precio={precios[index]} 
                                             />
                                         </div>
                                     ))}
