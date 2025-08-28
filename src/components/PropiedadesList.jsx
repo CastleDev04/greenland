@@ -165,7 +165,7 @@ export default function PropiedadesList() {
                                     titulo={lote.loteamiento || lote.titulo} 
                                     ubicacion={lote.distrito || lote.ubicacion} 
                                     superficie={lote.superficie} 
-                                    precio={lote.precioTotal || lote.precio} 
+                                    precio={lote.precioTotal} 
                                 />
                             </div>
                         ))}
