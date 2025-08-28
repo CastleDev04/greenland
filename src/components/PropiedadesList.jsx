@@ -24,7 +24,9 @@ export default function PropiedadesList() {
         propiedad.modalidadPago && 
         propiedad.modalidadPago.toLowerCase() === 'contado' &&
         propiedad.precioTotal && 
-        propiedad.precioTotal > 100000000 
+        propiedad.precioTotal > 100000000 &&
+        propiedad.estadoVenta &&
+        propiedad.estadoVenta.toLowerCase()=== "disponible"
     );
     
     // Limitar a máximo 6 propiedades
