@@ -19,14 +19,16 @@ export default function PropiedadesList() {
             const res = await fetch(`https://backend-greenland.onrender.com/api/propiedades`);
             if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
             const datos = await res.json();
-            // Filtrar solo propiedades al contado
-            const propiedadesContado = datos.filter(propiedad => 
-                propiedad.modalidadPago && 
-                propiedad.modalidadPago.toLowerCase() === 'contado'
-            );
-            
-            // Limitar a máximo 6 propiedades
-            setLotes(propiedadesContado.slice(0, 6));
+           // Filtrar propiedades al contado Y con precio mayor a 200,000,000
+    const propiedadesFiltradas = datos.filter(propiedad => 
+        propiedad.modalidadPago && 
+        propiedad.modalidadPago.toLowerCase() === 'contado' &&
+        propiedad.precioTotal && 
+        parseInt(propiedad.precioTotal) > 200000000
+    );
+    
+    // Limitar a máximo 6 propiedades
+    setLotes(propiedadesFiltradas.slice(0, 6));
         } catch (error) {
             console.error('Error loading propiedades:', error);
             setError(error.message);
