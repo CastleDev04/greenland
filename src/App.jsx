@@ -14,6 +14,9 @@ import FormularioAdmin from "./pages/pagesSystem/FormularioAdmin.jsx"
 import Admin from "./pages/pagesSystem/Admin.jsx"
 import PropiedadesSection from "./components/componentsSystem/PropiedadesSection.jsx";
 import Protected from "./components/componentsSystem/Protected.jsx"
+import ClienteSection from './SystemComponents/SystemSection/ClientesSection.jsx';
+import VentasSection from './SystemComponents/SystemSection/VentasSection.jsx';
+
 
 
 function App() {
@@ -23,8 +26,12 @@ function App() {
     switch (currentSection) {
       case 'propiedades':
         return <PropiedadesSection/>;
+      case "clientes":
+        return <ClienteSection/>;
+      case 'fraccionamiento':
+        return <h1>Seccion de fraccionamiento</h1>;
       case 'ventas':
-        return <h1>Seccion de ventas</h1>;
+        return <VentasSection/>;
       case 'pagos':
         return <h1>Seccion de Pagos</h1>;
       case 'reportes':
