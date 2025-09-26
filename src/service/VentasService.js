@@ -18,12 +18,25 @@ class VentasService {
       }
 
       const data = await response.json();
-      return data;
+      
+      // El backend devuelve { message: "...", ventas: [...] }
+      // Necesitamos extraer el array de ventas
+      console.log('Respuesta del backend:', data);
+      
+      // Si la respuesta tiene la propiedad 'ventas', devolver esa propiedad
+      if (data.ventas && Array.isArray(data.ventas)) {
+        return data.ventas;
+      }
+      
+      // Si no, devolver los datos directamente (por si acaso)
+      return data || [];
+      
     } catch (error) {
       console.error('Error al obtener ventas:', error);
       throw error;
     }
   }
+
 
   // Obtener una venta por ID
   async getVentaById(id) {
@@ -127,7 +140,7 @@ class VentasService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          // 'Authorization': `Bearer ${token}`
         }
       });
 
@@ -136,6 +149,7 @@ class VentasService {
       }
 
       const data = await response.json();
+      console.log(data)
       return data;
     } catch (error) {
       console.error('Error al obtener lotes:', error);

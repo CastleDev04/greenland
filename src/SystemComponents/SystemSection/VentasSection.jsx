@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Plus } from 'lucide-react';
 import VentasForm from '../SystemData/VentasForm';
 import VentasList from '../SystemData/VentasList';
 import Toast from '../SystemData/Toast';
@@ -12,13 +13,13 @@ const VentasSection = () => {
   const { 
     ventas, 
     loading, 
-    error, 
+    error: ventasError, 
     createVenta, 
     updateVenta, 
     deleteVenta,
     refetch 
   } = useVentas();
-  error;
+
   const {
     isFormOpen,
     editingVenta,
@@ -34,30 +35,47 @@ const VentasSection = () => {
   const [clientes, setClientes] = useState([]);
   const [lotes, setLotes] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
+  const [dataCargada, setDataCargada] = useState(false);
 
-  // Cargar datos iniciales
+  // Cargar datos iniciales UNA SOLA VEZ
   useEffect(() => {
+    if (dataCargada) return; // Evitar múltiples ejecuciones
+
     const loadInitialData = async () => {
       setLoadingData(true);
       try {
-        const [clientesData, lotesData] = await Promise.all([
-          clientesService.getClientes(),
-          ventasService.getLotesDisponibles()
-        ]);
-        setClientes(clientesData);
-        setLotes(lotesData);
-        await refetch();
+        console.log('Cargando datos iniciales...');
+        
+        // Cargar clientes
+        const clientesData = await clientesService.getClientes();
+        setClientes(Array.isArray(clientesData) ? clientesData : []);
+        
+        // Intentar cargar lotes (manejar error silenciosamente)
+        try {
+          const lotesData = await ventasService.getLotesDisponibles();
+          setLotes(Array.isArray(lotesData) ? lotesData : []);
+        } catch (lotesError) {
+          console.warn('Error cargando lotes:', lotesError);
+          setLotes([]);
+        }
+        
+        // Las ventas ya se cargan automáticamente en el hook useVentas
+        // NO llamar refetch() aquí para evitar ciclos
+        
+        setDataCargada(true);
+        
       } catch (error) {
-        showToast('Error al cargar datos iniciales', error);
+        console.error('Error cargando datos iniciales:', error);
+        showToast('Error al cargar datos iniciales', 'error');
       } finally {
         setLoadingData(false);
       }
     };
 
     loadInitialData();
-  }, [refetch, showToast]);
+  }, [dataCargada, showToast]); // Removí refetch de las dependencias
 
-  // Manejadores de acciones
+  // Manejadores de acciones optimizados
   const handleCreateVenta = async (ventaData) => {
     try {
       const newVenta = await createVenta(ventaData);
@@ -94,20 +112,22 @@ const VentasSection = () => {
   };
 
   const handleViewVenta = (venta) => {
-    // Implementar vista detallada de venta
-    console.log('Ver venta:', venta);
     showToast(`Vista de venta #${venta.id}`, 'info');
   };
 
   const handleExportVentas = (ventasFiltradas) => {
-    // Implementar exportación
-    console.log('Exportar ventas:', ventasFiltradas);
     showToast(`Exportando ${ventasFiltradas.length} ventas`, 'info');
   };
 
   const handleFormSubmitWrapper = async (ventaData) => {
     const submitFunction = editingVenta ? handleUpdateVenta : handleCreateVenta;
     await handleFormSubmit(ventaData, submitFunction);
+  };
+
+  // Botón para recargar manualmente si es necesario
+  const handleRecargarDatos = async () => {
+    setDataCargada(false);
+    await refetch();
   };
 
   if (loadingData) {
@@ -126,18 +146,39 @@ const VentasSection = () => {
         <p className="text-gray-600 mt-2">Gestión integral de ventas de lotes</p>
       </div>
 
-      <div className="mb-6">
+      {/* Mostrar error si existe */}
+      {ventasError && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800">Error cargando ventas: {ventasError.message}</p>
+          <button 
+            onClick={handleRecargarDatos}
+            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Reintentar
+          </button>
+        </div>
+      )}
+
+      <div className="mb-6 flex gap-4">
         <button
           onClick={openCreateForm}
           className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center"
         >
-          <PlusIcon className="w-5 h-5 mr-2" />
+          <Plus className="w-5 h-5 mr-2" />
           Nueva Venta
+        </button>
+        
+        <button
+          onClick={handleRecargarDatos}
+          className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium flex items-center"
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          Recargar Datos
         </button>
       </div>
 
       <VentasList
-        ventas={ventas}
+        ventas={ventas || []}
         loading={loading}
         onView={handleViewVenta}
         onEdit={openEditForm}
@@ -166,12 +207,5 @@ const VentasSection = () => {
     </div>
   );
 };
-
-// Icono Plus para el botón
-const PlusIcon = ({ className }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-  </svg>
-);
 
 export default VentasSection;

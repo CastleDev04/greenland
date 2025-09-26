@@ -1,34 +1,54 @@
-import { useState,  useCallback } from 'react';
+import { useState } from 'react';
 import clientesService from '../service/ClientesService';
 
 export const useClientes = () => {
-  const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [clientes, setClientes] = useState([]); // Asegurar que siempre sea array
 
-  const fetchClientes = useCallback(async () => {
+  const refetch = async () => {
     setLoading(true);
-    setError(null);
     try {
       const data = await clientesService.getClientes();
-      setClientes(data);
+      
+      // CORRECCIÓN: Asegurar que clientes siempre sea un array
+      const clientesArray = Array.isArray(data.clientes) ? data.clientes : 
+                           Array.isArray(data) ? data : [];
+      
+      setClientes(clientesArray);
+      setError(null);
     } catch (err) {
       setError(err.message);
+      console.error('Error fetching clients:', err);
+      // Asegurar que clientes sea array vacío en caso de error
+      setClientes([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   const createCliente = async (clienteData) => {
     setLoading(true);
     setError(null);
+    
     try {
-      const newCliente = await clientesService.createCliente(clienteData);
-      setClientes(prev => [...prev, newCliente]);
-      return newCliente;
-    } catch (err) {
-      setError(err.message);
-      throw err;
+      console.log('🔄 Creando cliente con datos:', clienteData);
+      
+      const result = await clientesService.createCliente(clienteData);
+      
+      // CORRECCIÓN: Verificar que prev sea array antes de hacer spread
+      setClientes(prev => {
+        const prevArray = Array.isArray(prev) ? prev : [];
+        const newCliente = result.newCliente || result;
+        return newCliente ? [...prevArray, newCliente] : prevArray;
+      });
+      
+      return result;
+      
+    } catch (error) {
+      console.error('💥 Error en useClientes.createCliente:', error);
+      setError(error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -36,18 +56,23 @@ export const useClientes = () => {
 
   const updateCliente = async (id, clienteData) => {
     setLoading(true);
-    setError(null);
     try {
-      const updatedCliente = await clientesService.updateCliente(id, clienteData);
-      setClientes(prev => 
-        prev.map(cliente => 
+      const result = await clientesService.updateCliente(id, clienteData);
+      
+      // CORRECCIÓN: Verificar que prev sea array
+      setClientes(prev => {
+        const prevArray = Array.isArray(prev) ? prev : [];
+        const updatedCliente = result.cliente || result;
+        
+        return prevArray.map(cliente => 
           cliente.id === id ? updatedCliente : cliente
-        )
-      );
-      return updatedCliente;
-    } catch (err) {
-      setError(err.message);
-      throw err;
+        );
+      });
+      
+      return result;
+    } catch (error) {
+      setError(error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -55,27 +80,31 @@ export const useClientes = () => {
 
   const deleteCliente = async (id) => {
     setLoading(true);
-    setError(null);
     try {
       await clientesService.deleteCliente(id);
-      setClientes(prev => prev.filter(cliente => cliente.id !== id));
-    } catch (err) {
-      setError(err.message);
-      throw err;
+      
+      // CORRECCIÓN: Verificar que prev sea array
+      setClientes(prev => {
+        const prevArray = Array.isArray(prev) ? prev : [];
+        return prevArray.filter(cliente => cliente.id !== id);
+      });
+      
+      return { success: true };
+    } catch (error) {
+      setError(error.message);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  
-
   return {
     clientes,
     loading,
     error,
-    refetch: fetchClientes,
     createCliente,
     updateCliente,
     deleteCliente,
+    refetch
   };
 };

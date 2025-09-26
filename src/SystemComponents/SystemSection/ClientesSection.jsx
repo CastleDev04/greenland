@@ -29,14 +29,17 @@ const ClientesSection = () => {
 
   const { toast, showToast, hideToast } = useToast();
 
+  // CORRECCIÓN: useEffect con dependencias vacías para ejecutar solo una vez
   useEffect(() => {
+    console.log('🔍 useEffect ejecutándose (solo una vez)');
     refetch();
-  }, [refetch]);
+  }, []); // ← Array de dependencias VACÍO
 
   const handleCreateCliente = async (clienteData) => {
     try {
       const newCliente = await createCliente(clienteData);
       showToast(`Cliente ${newCliente.nombre} creado exitosamente`, 'success');
+      // No llamar refetch aquí porque createCliente ya actualiza el estado local
     } catch (error) {
       showToast(error.message || 'Error al crear cliente', 'error');
     }
@@ -46,6 +49,7 @@ const ClientesSection = () => {
     try {
       const updatedCliente = await updateCliente(editingCliente.id, clienteData);
       showToast(`Cliente ${updatedCliente.nombre} actualizado`, 'success');
+      // No llamar refetch aquí porque updateCliente ya actualiza el estado local
     } catch (error) {
       showToast(error.message || 'Error al actualizar cliente', 'error');
     }
@@ -57,6 +61,7 @@ const ClientesSection = () => {
     try {
       await deleteCliente(cliente.id);
       showToast(`Cliente ${cliente.nombre} eliminado`, 'success');
+      // No llamar refetch aquí porque deleteCliente ya actualiza el estado local
     } catch (error) {
       showToast(error.message || 'Error al eliminar cliente', 'error');
     }
@@ -67,10 +72,17 @@ const ClientesSection = () => {
     await handleFormSubmit(clienteData, submitFunction);
   };
 
+  // Función para recargar manualmente si es necesario
+  const handleManualRefresh = () => {
+    console.log('🔄 Recarga manual solicitada');
+    refetch();
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <span className="ml-3 text-gray-600">Cargando clientes...</span>
       </div>
     );
   }
@@ -84,7 +96,7 @@ const ClientesSection = () => {
         onCreateClick={openCreateForm}
         onEditClick={openEditForm}
         onDeleteClick={handleDeleteCliente}
-        onRefresh={refetch}
+        onRefresh={handleManualRefresh} // ← Recarga manual, no automática
       />
       
       {isFormOpen && (

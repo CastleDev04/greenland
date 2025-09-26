@@ -11,9 +11,9 @@ import {
   User,
   Calendar,
   FileText,
-  MoreVertical,
   ChevronLeft,
-  ChevronRight,Eye
+  ChevronRight,
+  Eye
 } from 'lucide-react';
 
 const formatDate = (dateString) => {
@@ -27,7 +27,8 @@ export default function ClienteList({
   onEditClick, 
   onDeleteClick,
 }) {
-  const clientes = clientesFromProps || [];
+  // Asegúrate de que siempre sea un array
+  const clientes = Array.isArray(clientesFromProps) ? clientesFromProps : [];
   
   const [searchTerm, setSearchTerm] = useState('');
   const [filterNacionalidad, setFilterNacionalidad] = useState('');
@@ -42,7 +43,7 @@ export default function ClienteList({
     setSelectedCliente(cliente);
     setShowClienteModal(true);
   };
-  // Reemplazar las funciones de acción existentes:
+
   const handleEdit = (cliente) => {
     onEditClick(cliente);
   };
@@ -51,14 +52,22 @@ export default function ClienteList({
     onDeleteClick(cliente);
   };
 
-  // Filtros y búsqueda
+  // Filtros y búsqueda con protección adicional
   const filteredClientes = useMemo(() => {
+    if (!Array.isArray(clientes)) {
+      console.warn('clientes no es un array:', clientes);
+      return [];
+    }
+    
     return clientes.filter(cliente => {
+      // Protección contra cliente null/undefined
+      if (!cliente) return false;
+      
       const matchesSearch = searchTerm === '' || 
-        cliente.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cliente.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cliente.cedula.includes(searchTerm) ||
-        cliente.email.toLowerCase().includes(searchTerm.toLowerCase());
+        (cliente.nombre && cliente.nombre.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (cliente.apellido && cliente.apellido.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (cliente.cedula && cliente.cedula.includes(searchTerm)) ||
+        (cliente.email && cliente.email.toLowerCase().includes(searchTerm.toLowerCase()));
 
       const matchesNacionalidad = filterNacionalidad === '' || 
         cliente.nacionalidad === filterNacionalidad;
@@ -77,22 +86,19 @@ export default function ClienteList({
     return filteredClientes.slice(start, start + itemsPerPage);
   }, [filteredClientes, currentPage, itemsPerPage]);
 
-  
-
-  
-
   const getStatusColor = (lotes) => {
-    if (lotes.length === 0) return 'bg-gray-100 text-gray-800';
+    if (!lotes || lotes.length === 0) return 'bg-gray-100 text-gray-800';
     if (lotes.length === 1) return 'bg-blue-100 text-blue-800';
     return 'bg-green-100 text-green-800';
   };
 
   const getStatusText = (lotes) => {
-    if (lotes.length === 0) return 'Sin lotes';
+    if (!lotes || lotes.length === 0) return 'Sin lotes';
     if (lotes.length === 1) return '1 lote';
     return `${lotes.length} lotes`;
   };
 
+  // Resto del componente permanece igual...
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white">
       {/* Header */}
@@ -193,7 +199,7 @@ export default function ClienteList({
             <div className="ml-3">
               <p className="text-sm text-green-600">Con Lotes</p>
               <p className="text-2xl font-bold text-green-800">
-                {clientes.filter(c => c.lotes.length > 0).length}
+                {clientes.filter(c => c.lotes && c.lotes.length > 0).length}
               </p>
             </div>
           </div>
@@ -205,7 +211,7 @@ export default function ClienteList({
             <div className="ml-3">
               <p className="text-sm text-yellow-600">Este Mes</p>
               <p className="text-2xl font-bold text-yellow-800">
-                {clientes.filter(c => c.createdAt.includes('2024-04')).length}
+                {clientes.filter(c => c.createdAt && c.createdAt.includes('2024-04')).length}
               </p>
             </div>
           </div>
@@ -322,7 +328,7 @@ export default function ClienteList({
             <User className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-gray-900">No hay clientes</h3>
             <p className="mt-1 text-sm text-gray-500">
-              No se encontraron clientes con los filtros aplicados.
+              {clientes.length === 0 ? 'No hay clientes registrados.' : 'No se encontraron clientes con los filtros aplicados.'}
             </p>
           </div>
         )}
@@ -434,7 +440,7 @@ export default function ClienteList({
 
                   <div>
                     <h4 className="font-semibold text-gray-700 mb-2">Lotes Adquiridos</h4>
-                    {selectedCliente.lotes.length > 0 ? (
+                    {selectedCliente.lotes && selectedCliente.lotes.length > 0 ? (
                       <div className="space-y-1">
                         {selectedCliente.lotes.map((lote, index) => (
                           <span key={index} className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm mr-2 mb-1">
@@ -479,5 +485,5 @@ export default function ClienteList({
         </div>
       )}
     </div>
-    )
+  );
 };

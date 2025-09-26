@@ -14,36 +14,43 @@ export default function ClientesForm({
   title = null
 }) {
   const getInitialData = () => {
-    if (clienteData) {
-      return {
-        nombre: clienteData.nombre || '',
-        apellido: clienteData.apellido || '',
-        cedula: clienteData.cedula || '',
-        ruc: clienteData.ruc || '',
-        estadoCivil: clienteData.estadoCivil || '',
-        profesion: clienteData.profesion || '',
-        nacionalidad: clienteData.nacionalidad || '',
-        fechaNacimiento: clienteData.fechaNacimiento || '',
-        email: clienteData.email || '',
-        telefono: clienteData.telefono || '',
-        direccion: clienteData.direccion || ''
-      };
+  if (clienteData) {
+    // Convertir fecha ISO a formato YYYY-MM-DD para el input date
+    let fechaNacimientoFormatted = '';
+    if (clienteData.fechaNacimiento) {
+      const fecha = new Date(clienteData.fechaNacimiento);
+      fechaNacimientoFormatted = fecha.toISOString().split('T')[0];
     }
     
     return {
-      nombre: '',
-      apellido: '',
-      cedula: '',
-      ruc: '',
-      estadoCivil: '',
-      profesion: '',
-      nacionalidad: '',
-      fechaNacimiento: '',
-      email: '',
-      telefono: '',
-      direccion: ''
+      nombre: clienteData.nombre || '',
+      apellido: clienteData.apellido || '',
+      cedula: clienteData.cedula || '',
+      ruc: clienteData.ruc || '',
+      estadoCivil: clienteData.estadoCivil || '',
+      profesion: clienteData.profesion || '',
+      nacionalidad: clienteData.nacionalidad || '',
+      fechaNacimiento: fechaNacimientoFormatted,
+      email: clienteData.email || '',
+      telefono: clienteData.telefono || '',
+      direccion: clienteData.direccion || ''
     };
+  }
+  
+  return {
+    nombre: '',
+    apellido: '',
+    cedula: '',
+    ruc: '',
+    estadoCivil: '',
+    profesion: '',
+    nacionalidad: '',
+    fechaNacimiento: '',
+    email: '',
+    telefono: '',
+    direccion: ''
   };
+};
 
   const [formData, setFormData] = useState(getInitialData);
   const [errors, setErrors] = useState({});
@@ -86,51 +93,87 @@ export default function ClientesForm({
   };
 
   const validateForm = () => {
-    const newErrors = {};
+  const newErrors = {};
 
-    if (!formData.nombre.trim()) newErrors.nombre = 'El nombre es requerido';
-    if (!formData.apellido.trim()) newErrors.apellido = 'El apellido es requerido';
-    if (!formData.cedula.trim()) newErrors.cedula = 'La cédula es requerida';
-    if (!formData.email.trim()) newErrors.email = 'El email es requerido';
+  // Validaciones básicas de campos obligatorios
+  if (!formData.nombre.trim()) newErrors.nombre = 'El nombre es requerido';
+  if (!formData.apellido.trim()) newErrors.apellido = 'El apellido es requerido';
+  if (!formData.cedula.trim()) newErrors.cedula = 'La cédula es requerida';
+  if (!formData.email.trim()) newErrors.email = 'El email es requerido';
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (formData.email && !emailRegex.test(formData.email)) {
-      newErrors.email = 'Formato de email inválido';
-    }
+  // Email validation (menos estricto)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (formData.email && !emailRegex.test(formData.email)) {
+    newErrors.email = 'Formato de email inválido';
+  }
 
-    const cedulaRegex = /^\d{1,3}\.\d{3}\.\d{3}$|^\d{6,8}$/;
-    if (formData.cedula && !cedulaRegex.test(formData.cedula)) {
-      newErrors.cedula = 'Formato de cédula inválido (ej: 1.234.567 o 1234567)';
-    }
+  // Cédula validation (MUCHO MÁS FLEXIBLE)
+  if (formData.cedula && formData.cedula.trim().length < 3) {
+    newErrors.cedula = 'La cédula debe tener al menos 3 caracteres';
+  }
 
-    if (formData.ruc) {
-      const rucRegex = /^\d{1,3}\.\d{3}\.\d{3}-\d$|^\d{6,8}-\d$/;
-      if (!rucRegex.test(formData.ruc)) {
-        newErrors.ruc = 'Formato de RUC inválido (ej: 1.234.567-8)';
-      }
-    }
+  // RUC validation (opcional, más flexible)
+  if (formData.ruc && formData.ruc.trim().length < 3) {
+    newErrors.ruc = 'El RUC debe tener al menos 3 caracteres';
+  }
 
-    if (formData.telefono) {
-      const telefonoRegex = /^(\+595|0)[0-9]{8,9}$/;
-      if (!telefonoRegex.test(formData.telefono.replace(/\s|-/g, ''))) {
-        newErrors.telefono = 'Formato de teléfono inválido (ej: +59521123456 o 021123456)';
-      }
-    }
+  // Teléfono validation (opcional, más flexible)
+  if (formData.telefono && formData.telefono.replace(/\D/g, '').length < 6) {
+    newErrors.telefono = 'El teléfono debe tener al menos 6 dígitos';
+  }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+// AGREGA ESTA FUNCIÓN PARA DEBUGGEAR
+// REEMPLAZA la función handleSubmit en tu ClientesForm.jsx
+const handleSubmit = async () => {
+  console.log('🔍 VALIDANDO FORMULARIO:');
+  console.log('📋 Datos del formulario:', formData);
+  console.log('✅ Campos obligatorios llenos:', {
+    nombre: !!formData.nombre.trim(),
+    apellido: !!formData.apellido.trim(),
+    cedula: !!formData.cedula.trim(),
+    email: !!formData.email.trim()
+  });
+
+  if (!validateForm()) {
+    console.log('❌ Validación fallida, errores:', errors);
+    return;
+  }
+
+  // FORMATO CORREGIDO para coincidir con el ejemplo
+  const dataToSubmit = {
+    nombre: formData.nombre.trim(),
+    apellido: formData.apellido.trim(),
+    cedula: formData.cedula.trim(),
+    // Campos opcionales - convertir vacíos a null/undefined
+    ruc: formData.ruc.trim() || undefined,
+    estadoCivil: formData.estadoCivil.trim() || undefined,
+    profesion: formData.profesion.trim() || undefined,
+    nacionalidad: formData.nacionalidad.trim() || undefined,
+    // Fecha en formato correcto (con timezone)
+    fechaNacimiento: formData.fechaNacimiento ? 
+      new Date(formData.fechaNacimiento).toISOString() : undefined,
+    email: formData.email.trim(),
+    telefono: formData.telefono.trim() || undefined,
+    direccion: formData.direccion.trim() || undefined
   };
 
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
+  // Limpiar campos undefined para que no se envíen
+  Object.keys(dataToSubmit).forEach(key => {
+    if (dataToSubmit[key] === undefined || dataToSubmit[key] === '') {
+      delete dataToSubmit[key];
+    }
+  });
 
-    const dataToSubmit = {
-      ...formData,
-      ...(isEditing && clienteData?.id && { id: clienteData.id })
-    };
+  console.log('📤 Datos a enviar al servidor (formato corregido):', dataToSubmit);
+  console.log('📤 JSON stringificado:', JSON.stringify(dataToSubmit, null, 2));
 
-    await onSubmit(dataToSubmit);
-  };
+  await onSubmit(dataToSubmit);
+};
+  
 
   const formTitle = title || (isEditing ? 'Editar Cliente' : 'Registro de Cliente');
   const buttonText = isEditing ? 'Actualizar Cliente' : 'Registrar Cliente';
