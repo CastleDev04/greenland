@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeClosed } from 'lucide-react';
 
 export default function FormularioLogin() {
 
@@ -7,6 +8,11 @@ export default function FormularioLogin() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const [error, setError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,13 +74,19 @@ export default function FormularioLogin() {
 
                 <div>
                     <label className="block mb-1">Contraseña</label>
-                    <input
-                    type="password"
-                    className="w-full px-3 py-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    />
+                    <div className="flex">
+                        <input
+                        type={showPassword ? "text" : "password"}
+                        className="w-full px-3 py-2 bg-gray-700 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        />
+                        <button type="button" onClick={togglePasswordVisibility} className="px-3 mt-2 text-sm text-blue-400 hover:underline">
+                            {showPassword ? <Eye/> : <EyeClosed />}
+                        </button>
+                    </div>
+                    
                 </div>
 
                 <button
