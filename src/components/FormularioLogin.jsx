@@ -9,6 +9,7 @@ export default function FormularioLogin() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -17,7 +18,8 @@ export default function FormularioLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("https://backend-greenland.onrender.com/api/auth/login",{
+        setIsLoading(true)
+      const res = await fetch("https://backend-greenland-1.onrender.com/api/auth/login",{
         method: "POST",
         headers:{
             "Content-Type": "application/json"
@@ -25,8 +27,20 @@ export default function FormularioLogin() {
         body: JSON.stringify({ email, password })
       })
 
-       const data = await res.json();
       console.log(res.ok)
+      
+      if (!res.ok) {
+          await new Promise(resolve => setTimeout(resolve, 50000));
+          const res = await fetch("https://backend-greenland-1.onrender.com/api/auth/login",{
+        method: "POST",
+        headers:{
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+        
+      })
+    }
+      const data = await res.json();
       if (!res.ok) {
         setError(data.message || "Error al iniciar sesión");
         return;
@@ -43,8 +57,20 @@ export default function FormularioLogin() {
     } catch (err) {
         console.error("Error al iniciar sesion:", err);
       setError(err.response?.data?.message || "Error al iniciar sesión");
+    }finally {
+      setIsLoading(false);
     }
   };
+   if (isLoading) {
+    return (
+      <div className="p-4 flex justify-center items-center min-h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Conectando con el servidor</p>
+        </div>
+      </div>
+    );
+  }
 
     return(
         <>
@@ -105,5 +131,6 @@ export default function FormularioLogin() {
                     </form>
             </div>
     </>
+    
     )
 };

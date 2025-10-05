@@ -20,7 +20,7 @@ const PropiedadesSection = () => {
   const token = localStorage.getItem("token");
 
   // Configuración de API
-  const API_BASE_URL = 'https://backend-greenland.onrender.com';
+  const API_BASE_URL = 'https://backend-greenland-1.onrender.com';
 
   useEffect(() => {
     loadPropiedades();
@@ -30,7 +30,7 @@ const PropiedadesSection = () => {
     try {
       setCargando(true);
       setError(null);
-      const res = await fetch(`https://backend-greenland.onrender.com/api/propiedades`);
+      const res = await fetch(`https://backend-greenland-1.onrender.com/api/propiedades`);
       if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
       const data = await res.json();
       setPropiedades(data);
