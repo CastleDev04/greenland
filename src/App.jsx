@@ -16,6 +16,8 @@ import PropiedadesSection from "./components/componentsSystem/PropiedadesSection
 import Protected from "./components/componentsSystem/Protected.jsx"
 import ClienteSection from './SystemComponents/SystemSection/ClientesSection.jsx';
 import VentasSection from './SystemComponents/SystemSection/VentasSection.jsx';
+import PagosSection from './SystemComponents/SystemSection/PagosSection.jsx';
+import UsuariosSection from './SystemComponents/SystemSection/UsuariosSection.jsx';
 
 
 
@@ -33,13 +35,13 @@ function App() {
       case 'ventas':
         return <VentasSection/>;
       case 'pagos':
-        return <h1>Seccion de Pagos</h1>;
+        return <PagosSection/>;
       case 'reportes':
         return <h1>Seccion de reportes</h1>;
       case 'usuarios':
         return <h1>Seccion de usuarios</h1>;
       default:
-        return <PropiedadesSection/>;
+        return <h1>Seccion de usuarios</h1>;
     }
   };
 

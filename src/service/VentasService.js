@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://backend-greenland-1.onrender.com/api';
+const API_BASE_URL = 'https://api.greenlandpy.com/api';
 const token = localStorage.getItem("token");
 
 class VentasService {

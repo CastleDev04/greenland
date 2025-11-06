@@ -20,7 +20,7 @@ const PropiedadesSection = () => {
   const token = localStorage.getItem("token");
 
   // Configuración de API
-  const API_BASE_URL = 'https://backend-greenland-1.onrender.com';
+  const API_BASE_URL = 'https://api.greenlandpy.com/api/';
 
   useEffect(() => {
     loadPropiedades();
@@ -30,7 +30,7 @@ const PropiedadesSection = () => {
     try {
       setCargando(true);
       setError(null);
-      const res = await fetch(`https://backend-greenland-1.onrender.com/api/propiedades`);
+      const res = await fetch(`https://api.greenlandpy.com/api/lotes`);
       if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
       const data = await res.json();
       setPropiedades(data);
@@ -61,7 +61,7 @@ const PropiedadesSection = () => {
 
     try {
       setOperando(true);
-      const res = await fetch(`${API_BASE_URL}/api/propiedades/${id}`, {
+      const res = await fetch(`https://api.greenlandpy.com/api/lotes/${id}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ const PropiedadesSection = () => {
       setShowForm(false);
       if (editingProperty) {
         // Actualizar
-        const res = await fetch(`${API_BASE_URL}/api/propiedades/${editingProperty.id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/lotes/${editingProperty.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const PropiedadesSection = () => {
         ));
       } else {
         // Crear
-        const res = await fetch(`${API_BASE_URL}/api/propiedades`, {
+        const res = await fetch(`${API_BASE_URL}/api/lotes`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

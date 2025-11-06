@@ -19,7 +19,7 @@ export default function FormularioLogin() {
     e.preventDefault();
     try {
         setIsLoading(true)
-      const res = await fetch("https://backend-greenland-1.onrender.com/api/auth/login",{
+      const res = await fetch("https://api.greenlandpy.com/api/login",{
         method: "POST",
         headers:{
             "Content-Type": "application/json"
@@ -31,7 +31,7 @@ export default function FormularioLogin() {
       
       if (!res.ok) {
           await new Promise(resolve => setTimeout(resolve, 50000));
-          const res = await fetch("https://backend-greenland-1.onrender.com/api/auth/login",{
+          const res = await fetch("https://api.greenlandpy.com/api/login",{
         method: "POST",
         headers:{
             "Content-Type": "application/json"
