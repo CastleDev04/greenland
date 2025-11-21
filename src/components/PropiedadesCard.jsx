@@ -26,7 +26,7 @@ export default function PropiedadesCard(params) {
                     <div className="absolute top-4 left-4">
                         <span className="bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg flex items-center gap-1">
                             <IoHomeOutline className="w-4 h-4" />
-                            {params.titulo}
+                            {params.tipo}
                         </span>
                     </div>
                 </div>
@@ -36,7 +36,7 @@ export default function PropiedadesCard(params) {
                     {/* Título */}
                     <div className="text-center">
                         <h2 className="text-xl md:text-2xl font-bold text-gray-800 font-display leading-tight">
-                            {params.titulo}
+                        Las Lomas Country
                         </h2>
                     </div>
 
