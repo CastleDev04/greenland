@@ -132,13 +132,7 @@ export default function PagosList({
               Gestiona los pagos de las ventas realizadas
             </p>
           </div>
-          <button 
-            onClick={onCreateClick} 
-            className="mt-4 sm:mt-0 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
-          >
-            <Plus size={20} className="mr-2" />
-            Registrar Pago
-          </button>
+          
         </div>
       </div>
 

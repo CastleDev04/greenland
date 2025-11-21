@@ -1,143 +1,235 @@
-// services/usuariosService.js
-import axios from 'axios';
+const API_BASE_URL = 'https://api.greenlandpy.com/api';
 
-const API_URL = 'https://api.greenlandpy.com/api';
-
-// Crear instancia de axios con configuración base
-const apiClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  },
-  withCredentials: true,
-});
-
-// Interceptor para agregar token si existe
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+class usuariosService {
+  // 🔹 Obtener token dinámicamente
+  getToken() {
+    return localStorage.getItem("token");
   }
-);
 
-// Interceptor para manejar errores globales
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
-const usuarioService = {
-  // Obtener todos los usuarios
-  getAll: async () => {
+  // 🔹 Obtener todos los usuarios
+  async getAll() {
     try {
-      const response = await apiClient.get('/usuarios');
-      return response.data;
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/usuarios`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Usuarios obtenidos:', data);
+      return data;
     } catch (error) {
       console.error('Error al obtener usuarios:', error);
       throw error;
     }
-  },
+  }
 
-  // Obtener un usuario por ID
-  getById: async (id) => {
+  // 🔹 Obtener usuario por ID
+  async getById(id) {
     try {
-      const response = await apiClient.get(`/usuarios/${id}`);
-      return response.data;
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/usuarios/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error(`Error al obtener usuario ${id}:`, error);
       throw error;
     }
-  },
+  }
 
-  // Crear un nuevo usuario
-  create: async (usuarioData) => {
+  // 🔹 Crear nuevo usuario
+  async create(usuarioData) {
     try {
-      const response = await apiClient.post('/usuarios', usuarioData);
-      return response.data;
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/usuarios`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(usuarioData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error('Error al crear usuario:', error);
       throw error;
     }
-  },
+  }
 
-  // Actualizar un usuario
-  update: async (id, usuarioData) => {
+  // 🔹 Actualizar usuario
+  async update(id, usuarioData) {
     try {
-      const response = await apiClient.put(`/usuarios/${id}`, usuarioData);
-      return response.data;
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/usuarios/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(usuarioData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error(`Error al actualizar usuario ${id}:`, error);
       throw error;
     }
-  },
+  }
 
-  // Eliminar un usuario
-  delete: async (id) => {
+  // 🔹 Eliminar usuario
+  async delete(id) {
     try {
-      const response = await apiClient.delete(`/usuarios/${id}`);
-      return response.data;
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/usuarios/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      return { success: true };
     } catch (error) {
       console.error(`Error al eliminar usuario ${id}:`, error);
       throw error;
     }
-  },
+  }
 
-  // Cambiar contraseña
-  changePassword: async (id, passwords) => {
+  // 🔹 Cambiar contraseña
+  async changePassword(id, passwords) {
     try {
-      const response = await apiClient.put(`/usuarios/${id}/password`, passwords);
-      return response.data;
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/usuarios/${id}/password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(passwords),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error(`Error al cambiar contraseña del usuario ${id}:`, error);
       throw error;
     }
-  },
+  }
 
-  // Obtener usuarios por rol
-  getByRol: async (rol) => {
+  // 🔹 Obtener usuarios por rol
+  async getByRol(rol) {
     try {
-      const response = await apiClient.get(`/usuarios/rol/${rol}`);
-      return response.data;
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/usuarios/rol/${rol}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error(`Error al obtener usuarios con rol ${rol}:`, error);
       throw error;
     }
-  },
+  }
 
-  // Activar/Desactivar usuario (si tienes esta funcionalidad)
-  toggleStatus: async (id) => {
+  // 🔹 Verificar si un email ya existe
+  async checkEmail(email) {
     try {
-      const response = await apiClient.patch(`/usuarios/${id}/toggle-status`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error al cambiar estado del usuario ${id}:`, error);
-      throw error;
-    }
-  },
+      const response = await fetch(`${API_BASE_URL}/usuarios/check-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
 
-  // Verificar si el email ya existe
-  checkEmail: async (email) => {
-    try {
-      const response = await apiClient.post('/usuarios/check-email', { email });
-      return response.data;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error('Error al verificar email:', error);
       throw error;
     }
-  },
-};
+  }
 
-export default usuarioService;
+  // 🔹 Activar o desactivar usuario
+  async toggleStatus(id) {
+    try {
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/usuarios/${id}/toggle-status`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`Error al cambiar estado del usuario ${id}:`, error);
+      throw error;
+    }
+  }
+}
+
+export default new usuariosService();

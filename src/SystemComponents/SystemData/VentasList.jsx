@@ -87,7 +87,7 @@ const VentasList = ({
     }
   };
 
-  // Formatear fecha completa
+  // Formatear fecha completa Registrar Pago
   const formatDateLong = (dateString) => {
     if (!dateString) return 'No especificada';
     try {

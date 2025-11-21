@@ -19,8 +19,33 @@ export const useUsuarios = () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await usuariosService.getAll();
-        setUsuarios(data);
+        const response = await usuariosService.getAll();
+        
+        // 🔹 Manejo flexible de la respuesta
+        console.log('Respuesta del servicio:', response);
+        
+        let usuariosArray = [];
+        
+        if (Array.isArray(response)) {
+          // Si la respuesta es directamente un array
+          usuariosArray = response;
+        } else if (response && Array.isArray(response.data)) {
+          // Si la respuesta tiene formato { data: [...] }
+          usuariosArray = response.data;
+        } else if (response && Array.isArray(response.usuarios)) {
+          // Si la respuesta tiene formato { usuarios: [...] }
+          usuariosArray = response.usuarios;
+        } else if (response && typeof response === 'object') {
+          // Si es un objeto, intentar encontrar el array
+          const possibleArrays = Object.values(response).filter(val => Array.isArray(val));
+          if (possibleArrays.length > 0) {
+            usuariosArray = possibleArrays[0];
+          }
+        }
+        
+        console.log('Usuarios procesados:', usuariosArray);
+        setUsuarios(usuariosArray);
+        
       } catch (err) {
         setError(err.message || 'Error al cargar los usuarios');
         console.error('Error al cargar usuarios:', err);
@@ -37,11 +62,15 @@ export const useUsuarios = () => {
     setLoading(true);
     setError(null);
     try {
-      const newUsuario = await usuariosService.create(usuarioData);
+      const response = await usuariosService.create(usuarioData);
+      
+      // Extraer el usuario creado
+      const newUsuario = response.data || response.usuario || response;
+      
       setUsuarios(prev => [...prev, newUsuario]);
       return { success: true, data: newUsuario };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al crear el usuario';
+      const errorMessage = err.message || 'Error al crear el usuario';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -54,13 +83,17 @@ export const useUsuarios = () => {
     setLoading(true);
     setError(null);
     try {
-      const updatedUsuario = await usuariosService.update(id, usuarioData);
+      const response = await usuariosService.update(id, usuarioData);
+      
+      // Extraer el usuario actualizado
+      const updatedUsuario = response.data || response.usuario || response;
+      
       setUsuarios(prev => 
         prev.map(usuario => usuario.id === id ? updatedUsuario : usuario)
       );
       return { success: true, data: updatedUsuario };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al actualizar el usuario';
+      const errorMessage = err.message || 'Error al actualizar el usuario';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -77,7 +110,7 @@ export const useUsuarios = () => {
       setUsuarios(prev => prev.filter(usuario => usuario.id !== id));
       return { success: true };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al eliminar el usuario';
+      const errorMessage = err.message || 'Error al eliminar el usuario';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -90,10 +123,11 @@ export const useUsuarios = () => {
     setLoading(true);
     setError(null);
     try {
-      const usuario = await usuariosService.getById(id);
+      const response = await usuariosService.getById(id);
+      const usuario = response.data || response.usuario || response;
       return { success: true, data: usuario };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al obtener el usuario';
+      const errorMessage = err.message || 'Error al obtener el usuario';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -106,13 +140,15 @@ export const useUsuarios = () => {
     setLoading(true);
     setError(null);
     try {
-      const updatedUsuario = await usuariosService.changePassword(id, passwords);
+      const response = await usuariosService.changePassword(id, passwords);
+      const updatedUsuario = response.data || response.usuario || response;
+      
       setUsuarios(prev => 
         prev.map(usuario => usuario.id === id ? updatedUsuario : usuario)
       );
       return { success: true, data: updatedUsuario };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al cambiar la contraseña';
+      const errorMessage = err.message || 'Error al cambiar la contraseña';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -125,13 +161,15 @@ export const useUsuarios = () => {
     setLoading(true);
     setError(null);
     try {
-      const updatedUsuario = await usuariosService.toggleStatus(id);
+      const response = await usuariosService.toggleStatus(id);
+      const updatedUsuario = response.data || response.usuario || response;
+      
       setUsuarios(prev => 
         prev.map(usuario => usuario.id === id ? updatedUsuario : usuario)
       );
       return { success: true, data: updatedUsuario };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al cambiar el estado';
+      const errorMessage = err.message || 'Error al cambiar el estado';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {

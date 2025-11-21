@@ -246,7 +246,7 @@ export default function ClienteList({
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedClientes.map((cliente) => (
-                <tr key={cliente.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={cliente.cedula} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">

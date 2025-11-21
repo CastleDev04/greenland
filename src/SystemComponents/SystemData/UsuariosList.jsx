@@ -27,7 +27,7 @@ export default function UsuariosList({
   onCreateClick,
   onEditClick, 
   onDeleteClick,
-  onChangePasswordClick,
+  // onChangePasswordClick,
 }) {
   const usuarios = Array.isArray(usuariosFromProps) ? usuariosFromProps : [];
   
@@ -54,9 +54,9 @@ export default function UsuariosList({
     onDeleteClick(usuario);
   };
 
-  const handleChangePassword = (usuario) => {
-    onChangePasswordClick(usuario);
-  };
+  // const handleChangePassword = (usuario) => {
+  //   onChangePasswordClick(usuario);
+  // };
 
   // Filtros y búsqueda
   const filteredUsuarios = useMemo(() => {
@@ -292,13 +292,13 @@ export default function UsuariosList({
                       >
                         <Edit size={16} />
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => handleChangePassword(usuario)}
                         className="text-purple-600 hover:text-purple-900 p-1 rounded transition-colors"
                         title="Cambiar contraseña"
                       >
                         <Key size={16} />
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => handleDelete(usuario)}
                         className="text-red-600 hover:text-red-900 p-1 rounded transition-colors"

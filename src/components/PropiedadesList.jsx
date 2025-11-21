@@ -18,7 +18,7 @@ export default function PropiedadesList() {
         try {
             setLoading(true);
             setError(null);
-            const res = await fetch(`https://backend-greenland.onrender.com/api/propiedades`);
+            const res = await fetch(`https://api.greenlandpy.com/api/lotes`);
             if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
             const datos = await res.json();
            // Filtrar propiedades al contado Y con precio mayor a 200,000,000

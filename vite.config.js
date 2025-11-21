@@ -6,6 +6,16 @@ import flowbiteReact from "flowbite-react/plugin/vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [tailwindcss(), react(), flowbiteReact()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://api.greenlandpy.com',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path
+      }
+    }
+  },
   
   theme: {
     extend: {

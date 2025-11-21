@@ -4,6 +4,7 @@ import State from 'react';
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar"
+import PropiedadDetalle from "./components/PropiedadDetalle"
 import WhatsAppButton from "./components/WhaatsAppButton"
 import Index from "./pages/index.jsx"
 import Nosotros from "./pages/Nosotros.jsx"
@@ -30,16 +31,16 @@ function App() {
         return <PropiedadesSection/>;
       case "clientes":
         return <ClienteSection/>;
-      case 'fraccionamiento':
-        return <h1>Seccion de fraccionamiento</h1>;
       case 'ventas':
         return <VentasSection/>;
       case 'pagos':
         return <PagosSection/>;
+      case 'fraccionamiento':
+        return <h1>Seccion de fraccionamiento</h1>;
       case 'reportes':
         return <h1>Seccion de reportes</h1>;
       case 'usuarios':
-        return <h1>Seccion de usuarios</h1>;
+        return <UsuariosSection/>;
       default:
         return <h1>Seccion de usuarios</h1>;
     }
@@ -54,6 +55,7 @@ function App() {
           <Route path="nosotros" element={<Nosotros />} />
           <Route path="servicios" element={<Servicios />} />
           <Route path="propiedades" element={<Propiedades />} />
+          <Route path="/propiedades/:id" element={<PropiedadDetalle />} />
           <Route path="contacto" element={<Contacto />} />
           <Route path="login" element={<FormularioAdmin />} />
           <Route path="system" element={ 

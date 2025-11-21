@@ -1,10 +1,15 @@
 const API_BASE_URL = 'https://api.greenlandpy.com/api';
-const token = localStorage.getItem("token");
 
 class VentasService {
+  // 🔹 Método para obtener el token dinámicamente
+  getToken() {
+    return localStorage.getItem("token");
+  }
+
   // Obtener todas las ventas
   async getVentas() {
     try {
+      const token = this.getToken();
       const response = await fetch(`${API_BASE_URL}/ventas`, {
         method: 'GET',
         headers: {
@@ -19,8 +24,6 @@ class VentasService {
 
       const data = await response.json();
       
-      // El backend devuelve { message: "...", ventas: [...] }
-      // Necesitamos extraer el array de ventas
       console.log('Respuesta del backend:', data);
       
       // Si la respuesta tiene la propiedad 'ventas', devolver esa propiedad
@@ -37,10 +40,10 @@ class VentasService {
     }
   }
 
-
   // Obtener una venta por ID
   async getVentaById(id) {
     try {
+      const token = this.getToken();
       const response = await fetch(`${API_BASE_URL}/ventas/${id}`, {
         method: 'GET',
         headers: {
@@ -61,9 +64,13 @@ class VentasService {
     }
   }
 
-  // Crear nueva venta
+  // Crear nueva venta - CORREGIDO
   async createVenta(ventaData) {
     try {
+      const token = this.getToken();
+      
+      console.log('📤 Creando venta con datos:', JSON.stringify(ventaData, null, 2));
+      
       const response = await fetch(`${API_BASE_URL}/ventas`, {
         method: 'POST',
         headers: {
@@ -73,22 +80,47 @@ class VentasService {
         body: JSON.stringify(ventaData)
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      console.log('📡 Estado respuesta:', response.status);
+      console.log('📡 URL respuesta:', response.url);
+
+      // SOLUCIÓN: Leer la respuesta UNA sola vez como texto primero
+      const responseText = await response.text();
+      console.log('📄 Respuesta completa del servidor:', responseText);
+
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (jsonError) {
+        console.log('❌ No se pudo parsear como JSON, usando texto plano');
+        responseData = { message: responseText };
       }
 
-      const data = await response.json();
-      return data;
+      if (!response.ok) {
+        const errorMessage = responseData.message || 
+                           responseData.error || 
+                           responseData.exception ||
+                           `Error ${response.status}: ${response.statusText}`;
+        
+        console.log('❌ Error del servidor:', errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      console.log('✅ Venta creada exitosamente:', responseData);
+      return responseData;
+
     } catch (error) {
-      console.error('Error al crear venta:', error);
+      console.error('❌ Error completo al crear venta:', error);
       throw error;
     }
   }
 
-  // Actualizar venta
+  // Actualizar venta - CORREGIDO
   async updateVenta(id, ventaData) {
     try {
+      const token = this.getToken();
+      
+      console.log(`📤 Actualizando venta #${id} con datos:`, JSON.stringify(ventaData, null, 2));
+      
       const response = await fetch(`${API_BASE_URL}/ventas/${id}`, {
         method: 'PUT',
         headers: {
@@ -98,22 +130,35 @@ class VentasService {
         body: JSON.stringify(ventaData)
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      // Leer respuesta como texto primero
+      const responseText = await response.text();
+      
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (jsonError) {
+        responseData = { message: responseText };
       }
 
-      const data = await response.json();
-      return data;
+      if (!response.ok) {
+        const errorMessage = responseData.message || 
+                           responseData.error || 
+                           `Error ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      console.log('✅ Venta actualizada:', responseData);
+      return responseData;
     } catch (error) {
-      console.error('Error al actualizar venta:', error);
+      console.error(`❌ Error al actualizar venta #${id}:`, error);
       throw error;
     }
   }
 
-  // Eliminar venta (cancelar)
+  // Eliminar venta (cancelar) - CORREGIDO
   async deleteVenta(id) {
     try {
+      const token = this.getToken();
       const response = await fetch(`${API_BASE_URL}/ventas/${id}`, {
         method: 'DELETE',
         headers: {
@@ -121,9 +166,21 @@ class VentasService {
         }
       });
 
+      // Leer respuesta como texto primero
+      const responseText = await response.text();
+      
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (jsonError) {
+        responseData = { message: responseText };
+      }
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+        const errorMessage = responseData.message || 
+                           responseData.error || 
+                           `Error ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
       }
 
       return { success: true };
@@ -136,11 +193,12 @@ class VentasService {
   // Obtener lotes disponibles
   async getLotesDisponibles() {
     try {
-      const response = await fetch(`${API_BASE_URL}/propiedades`, {
+      const token = this.getToken();
+      const response = await fetch(`${API_BASE_URL}/lotes`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          // 'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         }
       });
 
@@ -149,12 +207,24 @@ class VentasService {
       }
 
       const data = await response.json();
-      console.log(data)
+      console.log('Lotes disponibles:', data);
       return data;
     } catch (error) {
       console.error('Error al obtener lotes:', error);
       throw error;
     }
+  }
+
+  // 🔹 Método auxiliar para convertir camelCase a snake_case
+  toSnakeCase(obj) {
+    const newObj = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+        newObj[snakeKey] = obj[key];
+      }
+    }
+    return newObj;
   }
 }
 
