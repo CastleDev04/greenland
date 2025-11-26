@@ -1,32 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import clientesService from '../service/ClientesService';
 
 export const useClientes = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [clientes, setClientes] = useState([]); // Asegurar que siempre sea array
+  const [clientes, setClientes] = useState([]);
+  const [lotes, setLotes] = useState([]); // ← NUEVO ESTADO PARA LOTES
 
+  // Cargar ambos: clientes y lotes
   const refetch = async () => {
     setLoading(true);
     try {
-      const data = await clientesService.getClientes();
+      console.log('🔄 Cargando clientes y lotes...');
+      
+      // Cargar clientes y lotes en paralelo usando el MISMO servicio
+      const [clientesData, lotesData] = await Promise.all([
+        clientesService.getClientes(),
+        clientesService.getLotes() // ← NUEVO: Usar el método del mismo servicio
+      ]);
       
       // CORRECCIÓN: Asegurar que clientes siempre sea un array
-      const clientesArray = Array.isArray(data.clientes) ? data.clientes : 
-                           Array.isArray(data) ? data : [];
+      const clientesArray = Array.isArray(clientesData.clientes) ? clientesData.clientes : 
+                           Array.isArray(clientesData) ? clientesData : [];
+      
+      // CORRECCIÓN: Asegurar que lotes siempre sea un array
+      const lotesArray = Array.isArray(lotesData) ? lotesData : [];
+
+      console.log('✅ Clientes cargados:', clientesArray.length);
+      console.log('✅ Lotes cargados:', lotesArray.length);
       
       setClientes(clientesArray);
+      setLotes(lotesArray);
       setError(null);
     } catch (err) {
+      console.error('💥 Error cargando datos:', err);
       setError(err.message);
-      console.error('Error fetching clients:', err);
-      // Asegurar que clientes sea array vacío en caso de error
+      // Asegurar arrays vacíos en caso de error
       setClientes([]);
+      setLotes([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Cargar datos al inicializar el hook
+  useEffect(() => {
+    refetch();
+  }, []);
+
+  // ... (el resto de las funciones se mantienen igual) ...
   const createCliente = async (clienteData) => {
     setLoading(true);
     setError(null);
@@ -36,7 +58,6 @@ export const useClientes = () => {
       
       const result = await clientesService.createCliente(clienteData);
       
-      // CORRECCIÓN: Verificar que prev sea array antes de hacer spread
       setClientes(prev => {
         const prevArray = Array.isArray(prev) ? prev : [];
         const newCliente = result.newCliente || result;
@@ -58,17 +79,18 @@ export const useClientes = () => {
     setLoading(true);
     try {
       const result = await clientesService.updateCliente(id, clienteData);
-      
-      // CORRECCIÓN: Verificar que prev sea array
+
       setClientes(prev => {
         const prevArray = Array.isArray(prev) ? prev : [];
         const updatedCliente = result.cliente || result;
-        
-        return prevArray.map(cliente => 
-          cliente.id === id ? updatedCliente : cliente
+
+        return prevArray.map(cliente =>
+          cliente.id === id
+            ? { ...cliente, ...updatedCliente }
+            : cliente
         );
       });
-      
+
       return result;
     } catch (error) {
       setError(error.message);
@@ -83,7 +105,6 @@ export const useClientes = () => {
     try {
       await clientesService.deleteCliente(id);
       
-      // CORRECCIÓN: Verificar que prev sea array
       setClientes(prev => {
         const prevArray = Array.isArray(prev) ? prev : [];
         return prevArray.filter(cliente => cliente.id !== id);
@@ -98,13 +119,21 @@ export const useClientes = () => {
     }
   };
 
+  // Función para obtener lotes de un cliente específico
+  const getLotesDelCliente = (clienteId) => {
+    if (!clienteId || !Array.isArray(lotes)) return [];
+    return lotes.filter(lote => lote.compradorId === clienteId);
+  };
+
   return {
     clientes,
+    lotes, // ← EXPORTAR LOTES
     loading,
     error,
     createCliente,
     updateCliente,
     deleteCliente,
-    refetch
+    refetch,
+    getLotesDelCliente // ← NUEVA FUNCIÓN
   };
 };

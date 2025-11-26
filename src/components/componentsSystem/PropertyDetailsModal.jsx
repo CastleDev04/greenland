@@ -1,17 +1,25 @@
-
 import { Eye, Edit, Trash2, Plus, X, MapPin, Home, DollarSign, Settings } from 'lucide-react';
-
-
 
 const PropertyDetailsModal = ({ property, onClose }) => {
   if (!property) return null;
 
   const formatCurrency = (amount) => {
+    if (!amount) return '₲ 0';
     return new Intl.NumberFormat('es-PY', {
       style: 'currency',
       currency: 'PYG',
       minimumFractionDigits: 0
     }).format(amount);
+  };
+
+  // 🔥 CORRECCIÓN: Funciones seguras para arrays
+  const getSafeArray = (field) => {
+    return Array.isArray(property[field]) ? property[field] : [];
+  };
+
+  const hasArrayItems = (field) => {
+    const array = getSafeArray(field);
+    return array && array.length > 0;
   };
 
   const handleBackdropClick = (e) => {
@@ -46,19 +54,19 @@ const PropertyDetailsModal = ({ property, onClose }) => {
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <span className="font-medium text-gray-600">Fraccionamiento:</span>
-                <p className="mt-1">{property.fraccionamiento}</p>
+                <p className="mt-1">{property.fraccionamiento || 'No especificado'}</p>
               </div>
               <div>
                 <span className="font-medium text-gray-600">Distrito:</span>
-                <p className="mt-1">{property.distrito}</p>
+                <p className="mt-1">{property.distrito || 'No especificado'}</p>
               </div>
               <div>
                 <span className="font-medium text-gray-600">Loteamiento:</span>
-                <p className="mt-1">{property.loteamiento}</p>
+                <p className="mt-1">{property.loteamiento || 'No especificado'}</p>
               </div>
               <div>
                 <span className="font-medium text-gray-600">Superficie:</span>
-                <p className="mt-1">{property.superficie} m²</p>
+                <p className="mt-1">{property.superficie || '0'} m²</p>
               </div>
             </div>
           </div>
@@ -69,19 +77,19 @@ const PropertyDetailsModal = ({ property, onClose }) => {
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <span className="font-medium text-gray-600">Finca:</span>
-                <p className="mt-1">{property.finca}</p>
+                <p className="mt-1">{property.finca || 'No especificado'}</p>
               </div>
               <div>
                 <span className="font-medium text-gray-600">Padrón:</span>
-                <p className="mt-1">{property.padron}</p>
+                <p className="mt-1">{property.padron || 'No especificado'}</p>
               </div>
               <div>
                 <span className="font-medium text-gray-600">Cuenta Catastral:</span>
-                <p className="mt-1">{property.cuentaCatastral}</p>
+                <p className="mt-1">{property.cuentaCatastral || 'No especificado'}</p>
               </div>
               <div>
                 <span className="font-medium text-gray-600">Manzana - Lote:</span>
-                <p className="mt-1">{property.manzana} - {property.lote}</p>
+                <p className="mt-1">{property.manzana || 'N/A'} - {property.lote || 'N/A'}</p>
               </div>
             </div>
           </div>
@@ -101,7 +109,7 @@ const PropertyDetailsModal = ({ property, onClose }) => {
               </div>
               <div>
                 <span className="font-medium text-gray-600">Modalidad de Pago:</span>
-                <p className="mt-1">{property.modalidadPago}</p>
+                <p className="mt-1">{property.modalidadPago || 'No especificada'}</p>
               </div>
               {property.cuotas && (
                 <>
@@ -120,9 +128,11 @@ const PropertyDetailsModal = ({ property, onClose }) => {
                 <span className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${
                   property.estadoVenta === "Disponible"
                     ? "bg-green-200 text-green-800"
+                    : property.estadoVenta === "Reservado"
+                    ? "bg-yellow-200 text-yellow-800"
                     : "bg-red-200 text-red-800"
                 }`}>
-                  {property.estadoVenta}
+                  {property.estadoVenta || 'No especificado'}
                 </span>
               </div>
             </div>
@@ -137,11 +147,11 @@ const PropertyDetailsModal = ({ property, onClose }) => {
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <span className="font-medium text-gray-600">Latitud:</span>
-                <p className="mt-1">{property.latitud}</p>
+                <p className="mt-1">{property.latitud || 'No especificada'}</p>
               </div>
               <div>
                 <span className="font-medium text-gray-600">Longitud:</span>
-                <p className="mt-1">{property.longitud}</p>
+                <p className="mt-1">{property.longitud || 'No especificada'}</p>
               </div>
             </div>
           </div>
@@ -151,20 +161,20 @@ const PropertyDetailsModal = ({ property, onClose }) => {
             <h3 className="text-lg font-semibold">Linderos</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
               <div>
-                <span className="font-medium text-gray-600">Norte ({property.linderoNorteMedida}m):</span>
-                <p className="mt-1">{property.linderoNorteCon}</p>
+                <span className="font-medium text-gray-600">Norte {property.linderoNorteMedida && `(${property.linderoNorteMedida}m)`}:</span>
+                <p className="mt-1">{property.linderoNorteCon || 'No especificado'}</p>
               </div>
               <div>
-                <span className="font-medium text-gray-600">Sur ({property.linderoSurMedida}m):</span>
-                <p className="mt-1">{property.linderoSurCon}</p>
+                <span className="font-medium text-gray-600">Sur {property.linderoSurMedida && `(${property.linderoSurMedida}m)`}:</span>
+                <p className="mt-1">{property.linderoSurCon || 'No especificado'}</p>
               </div>
               <div>
-                <span className="font-medium text-gray-600">Este ({property.linderoEsteMedida}m):</span>
-                <p className="mt-1">{property.linderoEsteCon}</p>
+                <span className="font-medium text-gray-600">Este {property.linderoEsteMedida && `(${property.linderoEsteMedida}m)`}:</span>
+                <p className="mt-1">{property.linderoEsteCon || 'No especificado'}</p>
               </div>
               <div>
-                <span className="font-medium text-gray-600">Oeste ({property.linderoOesteMedida}m):</span>
-                <p className="mt-1">{property.linderoOesteCon}</p>
+                <span className="font-medium text-gray-600">Oeste {property.linderoOesteMedida && `(${property.linderoOesteMedida}m)`}:</span>
+                <p className="mt-1">{property.linderoOesteCon || 'No especificado'}</p>
               </div>
             </div>
           </div>
@@ -218,12 +228,12 @@ const PropertyDetailsModal = ({ property, onClose }) => {
             </div>
           </div>
 
-          {/* Beneficios Comunes */}
-          {property.beneficiosComunes && property.beneficiosComunes.length > 0 && (
+          {/* 🔥 CORREGIDO: Beneficios Comunes con protección de array */}
+          {hasArrayItems('beneficiosComunes') && (
             <div className="space-y-4 md:col-span-2">
               <h3 className="text-lg font-semibold">Beneficios Comunes</h3>
               <div className="flex flex-wrap gap-2">
-                {property.beneficiosComunes.map((beneficio, index) => (
+                {getSafeArray('beneficiosComunes').map((beneficio, index) => (
                   <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
                     {beneficio}
                   </span>
@@ -232,12 +242,12 @@ const PropertyDetailsModal = ({ property, onClose }) => {
             </div>
           )}
 
-          {/* Restricciones */}
-          {property.restriccionConstrucion && property.restriccionConstrucion.length > 0 && (
+          {/* 🔥 CORREGIDO: Restricciones con protección de array */}
+          {hasArrayItems('restriccionConstrucion') && (
             <div className="space-y-4 md:col-span-2">
               <h3 className="text-lg font-semibold">Restricciones de Construcción</h3>
               <div className="flex flex-wrap gap-2">
-                {property.restriccionConstrucion.map((restriccion, index) => (
+                {getSafeArray('restriccionConstrucion').map((restriccion, index) => (
                   <span key={index} className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
                     {restriccion}
                   </span>
@@ -247,7 +257,7 @@ const PropertyDetailsModal = ({ property, onClose }) => {
           )}
 
           {/* Expensas */}
-          {property.requiereExpensas && (
+          {property.requiereExpensas && property.expensas && (
             <div className="space-y-4 md:col-span-2">
               <h3 className="text-lg font-semibold">Expensas</h3>
               <div className="text-sm">

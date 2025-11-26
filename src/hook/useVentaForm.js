@@ -1,45 +1,52 @@
-// hook/useVentaForm.js
 import { useState } from 'react';
 
 export const useVentaForm = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingVenta, setEditingVenta] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [formError, setFormError] = useState(null);
 
-  // Abrir formulario para crear nueva venta
   const openCreateForm = () => {
     setEditingVenta(null);
+    setFormError(null);
     setIsFormOpen(true);
   };
 
-  // Abrir formulario para editar venta existente
   const openEditForm = (venta) => {
     setEditingVenta(venta);
+    setFormError(null);
     setIsFormOpen(true);
   };
 
-  // Cerrar formulario
   const closeForm = () => {
     setIsFormOpen(false);
     setEditingVenta(null);
     setFormLoading(false);
+    setFormError(null);
   };
 
-  // Manejar envío del formulario
   const handleFormSubmit = async (ventaData, submitFunction) => {
     setFormLoading(true);
+    setFormError(null);
     
     try {
-      // submitFunction es createVenta o updateVenta
-      await submitFunction(ventaData);
-      
-      // Cerrar formulario después de éxito
+      console.log('📤 Enviando formulario de venta...');
+
+      const result = await submitFunction(ventaData);
+      console.log('✅ Formulario procesado exitosamente');
       closeForm();
       
-      return { success: true };
+      return { success: true, data: result };
+      
     } catch (error) {
-      console.error('Error en handleFormSubmit:', error);
-      return { success: false, error: error.message };
+      console.error('❌ Error en el formulario:', error);
+      const errorMessage = error.message || 'Error al procesar el formulario';
+      setFormError(errorMessage);
+      
+      return { 
+        success: false, 
+        error: errorMessage 
+      };
     } finally {
       setFormLoading(false);
     }
@@ -49,9 +56,11 @@ export const useVentaForm = () => {
     isFormOpen,
     editingVenta,
     formLoading,
+    formError,
     openCreateForm,
     openEditForm,
     closeForm,
-    handleFormSubmit
+    handleFormSubmit,
+    clearError: () => setFormError(null)
   };
 };

@@ -13,22 +13,29 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  Eye
+  Eye,
+  Building
 } from 'lucide-react';
 
 const formatDate = (dateString) => {
   if (!dateString) return 'N/A';
-  return new Date(dateString).toLocaleDateString('es-PY');
+  try {
+    return new Date(dateString).toLocaleDateString('es-PY');
+  } catch {
+    return 'Fecha inválida';
+  }
 };
 
 export default function ClienteList({ 
   clientes: clientesFromProps,
+  lotes: lotesFromProps = [], // ← NUEVA PROP PARA LOTES
   onCreateClick,
   onEditClick, 
   onDeleteClick,
 }) {
   // Asegúrate de que siempre sea un array
   const clientes = Array.isArray(clientesFromProps) ? clientesFromProps : [];
+  const lotes = Array.isArray(lotesFromProps) ? lotesFromProps : [];
   
   const [searchTerm, setSearchTerm] = useState('');
   const [filterNacionalidad, setFilterNacionalidad] = useState('');
@@ -38,6 +45,12 @@ export default function ClienteList({
   const [showClienteModal, setShowClienteModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+
+  // Función para obtener los lotes de un cliente específico
+  const getLotesDelCliente = (clienteId) => {
+    if (!clienteId || !Array.isArray(lotes)) return [];
+    return lotes.filter(lote => lote.compradorId === clienteId);
+  };
 
   const handleView = (cliente) => {
     setSelectedCliente(cliente);
@@ -66,7 +79,7 @@ export default function ClienteList({
       const matchesSearch = searchTerm === '' || 
         (cliente.nombre && cliente.nombre.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (cliente.apellido && cliente.apellido.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (cliente.cedula && cliente.cedula.includes(searchTerm)) ||
+        (cliente.cedula && cliente.cedula.toString().includes(searchTerm)) ||
         (cliente.email && cliente.email.toLowerCase().includes(searchTerm.toLowerCase()));
 
       const matchesNacionalidad = filterNacionalidad === '' || 
@@ -86,19 +99,57 @@ export default function ClienteList({
     return filteredClientes.slice(start, start + itemsPerPage);
   }, [filteredClientes, currentPage, itemsPerPage]);
 
-  const getStatusColor = (lotes) => {
-    if (!lotes || lotes.length === 0) return 'bg-gray-100 text-gray-800';
-    if (lotes.length === 1) return 'bg-blue-100 text-blue-800';
+  // CORREGIDO: Usar la función getLotesDelCliente
+  const getStatusColor = (clienteId) => {
+    const lotesCliente = getLotesDelCliente(clienteId);
+    if (lotesCliente.length === 0) return 'bg-gray-100 text-gray-800';
+    if (lotesCliente.length === 1) return 'bg-blue-100 text-blue-800';
     return 'bg-green-100 text-green-800';
   };
 
-  const getStatusText = (lotes) => {
-    if (!lotes || lotes.length === 0) return 'Sin lotes';
-    if (lotes.length === 1) return '1 lote';
-    return `${lotes.length} lotes`;
+  // CORREGIDO: Usar la función getLotesDelCliente
+  const getStatusText = (clienteId) => {
+    const lotesCliente = getLotesDelCliente(clienteId);
+    if (lotesCliente.length === 0) return 'Sin lotes';
+    if (lotesCliente.length === 1) return '1 lote';
+    return `${lotesCliente.length} lotes`;
   };
 
-  // Resto del componente permanece igual...
+  // Función para obtener información del lote
+  const getLoteInfo = (lote) => {
+    if (!lote) return 'Lote no disponible';
+    
+    if (lote.lote && lote.fraccionamiento) {
+      return `Lote ${lote.lote} - ${lote.fraccionamiento}`;
+    }
+    if (lote.lote) {
+      return `Lote ${lote.lote}`;
+    }
+    if (lote.fraccionamiento) {
+      return lote.fraccionamiento;
+    }
+    return `Lote #${lote.id}`;
+  };
+
+  // Calcular estadísticas reales
+  const estadisticas = useMemo(() => {
+    const totalClientes = clientes.length;
+    const clientesConLotes = clientes.filter(cliente => 
+      getLotesDelCliente(cliente.id).length > 0
+    ).length;
+    
+    // Clientes registrados este mes
+    const esteMes = new Date().getMonth() + 1;
+    const esteAnio = new Date().getFullYear();
+    const clientesEsteMes = clientes.filter(cliente => {
+      if (!cliente.createdAt && !cliente.created_at) return false;
+      const fecha = new Date(cliente.createdAt || cliente.created_at);
+      return fecha.getMonth() + 1 === esteMes && fecha.getFullYear() === esteAnio;
+    }).length;
+
+    return { totalClientes, clientesConLotes, clientesEsteMes };
+  }, [clientes, lotes]);
+
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white">
       {/* Header */}
@@ -181,26 +232,24 @@ export default function ClienteList({
         )}
       </div>
 
-      {/* Estadísticas */}
+      {/* Estadísticas CORREGIDAS */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-blue-50 p-4 rounded-lg">
           <div className="flex items-center">
             <User className="text-blue-600" size={24} />
             <div className="ml-3">
               <p className="text-sm text-blue-600">Total Clientes</p>
-              <p className="text-2xl font-bold text-blue-800">{clientes.length}</p>
+              <p className="text-2xl font-bold text-blue-800">{estadisticas.totalClientes}</p>
             </div>
           </div>
         </div>
         
         <div className="bg-green-50 p-4 rounded-lg">
           <div className="flex items-center">
-            <FileText className="text-green-600" size={24} />
+            <Building className="text-green-600" size={24} />
             <div className="ml-3">
               <p className="text-sm text-green-600">Con Lotes</p>
-              <p className="text-2xl font-bold text-green-800">
-                {clientes.filter(c => c.lotes && c.lotes.length > 0).length}
-              </p>
+              <p className="text-2xl font-bold text-green-800">{estadisticas.clientesConLotes}</p>
             </div>
           </div>
         </div>
@@ -210,15 +259,13 @@ export default function ClienteList({
             <Calendar className="text-yellow-600" size={24} />
             <div className="ml-3">
               <p className="text-sm text-yellow-600">Este Mes</p>
-              <p className="text-2xl font-bold text-yellow-800">
-                {clientes.filter(c => c.createdAt && c.createdAt.includes('2024-04')).length}
-              </p>
+              <p className="text-2xl font-bold text-yellow-800">{estadisticas.clientesEsteMes}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tabla de clientes */}
+      {/* Tabla de clientes CORREGIDA */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -245,80 +292,90 @@ export default function ClienteList({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedClientes.map((cliente) => (
-                <tr key={cliente.cedula} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {cliente.nombre} {cliente.apellido}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        CI: {cliente.cedula}
-                      </div>
-                      {cliente.ruc && (
+              {paginatedClientes.map((cliente) => {
+                const lotesCliente = getLotesDelCliente(cliente.id);
+                
+                return (
+                  <tr key={cliente.id || cliente.cedula} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {cliente.nombre} {cliente.apellido}
+                        </div>
                         <div className="text-sm text-gray-500">
-                          RUC: {cliente.ruc}
+                          CI: {cliente.cedula}
+                        </div>
+                        {cliente.ruc && (
+                          <div className="text-sm text-gray-500">
+                            RUC: {cliente.ruc}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 flex items-center mb-1">
+                        <Mail size={14} className="mr-1 text-gray-400" />
+                        {cliente.email}
+                      </div>
+                      {cliente.telefono && (
+                        <div className="text-sm text-gray-500 flex items-center">
+                          <Phone size={14} className="mr-1 text-gray-400" />
+                          {cliente.telefono}
                         </div>
                       )}
-                    </div>
-                  </td>
-                  
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 flex items-center mb-1">
-                      <Mail size={14} className="mr-1 text-gray-400" />
-                      {cliente.email}
-                    </div>
-                    {cliente.telefono && (
-                      <div className="text-sm text-gray-500 flex items-center">
-                        <Phone size={14} className="mr-1 text-gray-400" />
-                        {cliente.telefono}
+                    </td>
+                    
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{cliente.nacionalidad}</div>
+                      <div className="text-sm text-gray-500">{cliente.profesion}</div>
+                      <div className="text-sm text-gray-500">{cliente.estadoCivil}</div>
+                    </td>
+                    
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(cliente.id)}`}>
+                        {getStatusText(cliente.id)}
+                      </span>
+                      {lotesCliente.length > 0 && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          {lotesCliente.slice(0, 2).map(lote => getLoteInfo(lote)).join(', ')}
+                          {lotesCliente.length > 2 && `... (+${lotesCliente.length - 2})`}
+                        </div>
+                      )}
+                    </td>
+                    
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(cliente.createdAt || cliente.created_at)}
+                    </td>
+                    
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex justify-end space-x-2">
+                        <button
+                          onClick={() => handleView(cliente)}
+                          className="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors"
+                          title="Ver detalles"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleEdit(cliente)}
+                          className="text-green-600 hover:text-green-900 p-1 rounded transition-colors"
+                          title="Editar"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(cliente)}
+                          className="text-red-600 hover:text-red-900 p-1 rounded transition-colors"
+                          title="Eliminar"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
-                    )}
-                  </td>
-                  
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{cliente.nacionalidad}</div>
-                    <div className="text-sm text-gray-500">{cliente.profesion}</div>
-                    <div className="text-sm text-gray-500">{cliente.estadoCivil}</div>
-                  </td>
-                  
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(cliente.lotes)}`}>
-                      {getStatusText(cliente.lotes)}
-                    </span>
-                  </td>
-                  
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(cliente.createdAt)}
-                  </td>
-                  
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end space-x-2">
-                      <button
-                        onClick={() => handleView(cliente)}
-                        className="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors"
-                        title="Ver detalles"
-                      >
-                        <Eye size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleEdit(cliente)}
-                        className="text-green-600 hover:text-green-900 p-1 rounded transition-colors"
-                        title="Editar"
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(cliente)}
-                        className="text-red-600 hover:text-red-900 p-1 rounded transition-colors"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -378,7 +435,7 @@ export default function ClienteList({
         </div>
       )}
 
-      {/* Modal de detalles del cliente */}
+      {/* Modal de detalles del cliente CORREGIDO */}
       {showClienteModal && selectedCliente && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto">
@@ -440,12 +497,18 @@ export default function ClienteList({
 
                   <div>
                     <h4 className="font-semibold text-gray-700 mb-2">Lotes Adquiridos</h4>
-                    {selectedCliente.lotes && selectedCliente.lotes.length > 0 ? (
-                      <div className="space-y-1">
-                        {selectedCliente.lotes.map((lote, index) => (
-                          <span key={index} className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm mr-2 mb-1">
-                            {lote}
-                          </span>
+                    {getLotesDelCliente(selectedCliente.id).length > 0 ? (
+                      <div className="space-y-2">
+                        {getLotesDelCliente(selectedCliente.id).map((lote, index) => (
+                          <div key={lote.id} className="bg-blue-50 p-2 rounded border border-blue-200">
+                            <div className="font-medium text-sm">{getLoteInfo(lote)}</div>
+                            {lote.fraccionamiento && (
+                              <div className="text-xs text-gray-600 mt-1">
+                                {lote.fraccionamiento}
+                                {lote.distrito && `, ${lote.distrito}`}
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </div>
                     ) : (

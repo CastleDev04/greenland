@@ -79,9 +79,10 @@ class ClientesService {
       method: 'GET',
       headers: this.getHeaders()
     });
+    
 
     const data = await this.handleResponse(response);
-    
+    console.log(data)
     // CORRECCIÓN: Manejar diferentes formatos de respuesta
     if (Array.isArray(data)) {
       return data; // Si la respuesta es directamente un array
@@ -90,6 +91,7 @@ class ClientesService {
     } else if (data && data.clientes) {
       // Si clientes no es array pero existe, convertirlo a array
       return [data.clientes];
+      
     } else {
       console.warn('⚠️ Formato de respuesta inesperado, retornando array vacío');
       return [];
@@ -146,6 +148,38 @@ class ClientesService {
     } catch (error) {
       console.error(`Error al obtener cliente ${id}:`, error);
       throw error;
+    }
+  }
+  async getLotes() {
+    try {
+      console.log('🔍 Intentando obtener lotes...');
+      
+      const response = await fetch(`${API_BASE_URL}/lotes`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+          // SIN Authorization header
+        }
+      });
+
+      const data = await this.handleResponse(response);
+      console.log('✅ Lotes obtenidos:', data);
+      
+      // Manejar diferentes formatos de respuesta
+      if (Array.isArray(data)) {
+        return data;
+      } else if (data && Array.isArray(data.lotes)) {
+        return data.lotes;
+      } else if (data && data.lotes) {
+        return [data.lotes];
+      } else {
+        console.warn('⚠️ Formato de respuesta inesperado para lotes, retornando array vacío');
+        return [];
+      }
+      
+    } catch (error) {
+      console.error('❌ Error al obtener lotes:', error);
+      return [];
     }
   }
 

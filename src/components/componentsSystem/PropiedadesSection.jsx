@@ -4,8 +4,6 @@ import { Eye, Edit, Trash2, Plus, X, MapPin, Home, DollarSign, Settings } from '
 import PropertyDetailsModal from "./PropertyDetailsModal"
 import PropertyForm from "./PropertyForm"
 
-
-
 // Componente Principal
 const PropiedadesSection = () => {
   const [showForm, setShowForm] = useState(false);
@@ -19,8 +17,8 @@ const PropiedadesSection = () => {
 
   const token = localStorage.getItem("token");
 
-  // Configuración de API
-  const API_BASE_URL = 'https://api.greenlandpy.com/api/';
+  // 🔥 CORRECCIÓN: URL base sin slash final duplicado
+  const API_BASE_URL = 'https://api.greenlandpy.com/api';
 
   useEffect(() => {
     loadPropiedades();
@@ -30,7 +28,7 @@ const PropiedadesSection = () => {
     try {
       setCargando(true);
       setError(null);
-      const res = await fetch(`https://api.greenlandpy.com/api/lotes`);
+      const res = await fetch(`${API_BASE_URL}/lotes`);
       if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
       const data = await res.json();
       setPropiedades(data);
@@ -61,12 +59,12 @@ const PropiedadesSection = () => {
 
     try {
       setOperando(true);
-      const res = await fetch(`https://api.greenlandpy.com/api/lotes/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/lotes/${id}`, {
         method: 'DELETE',
         headers: {
-            'Content-Type': 'application/json',
-            "Authorization": `Bearer ${token}`, 
-          },
+          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${token}`, 
+        },
       });
       
       if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
@@ -87,12 +85,11 @@ const PropiedadesSection = () => {
 
   const handleFormSubmit = async (data) => {
     try {
-
       setOperando(true);
-      setShowForm(false);
+      
       if (editingProperty) {
         // Actualizar
-        const res = await fetch(`${API_BASE_URL}/api/lotes/${editingProperty.id}`, {
+        const res = await fetch(`${API_BASE_URL}/lotes/${editingProperty.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -109,7 +106,7 @@ const PropiedadesSection = () => {
         ));
       } else {
         // Crear
-        const res = await fetch(`${API_BASE_URL}/api/lotes`, {
+        const res = await fetch(`${API_BASE_URL}/lotes`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -126,18 +123,26 @@ const PropiedadesSection = () => {
 
       setShowForm(false);
       setEditingProperty(null);
+      
+      // 🔥 CORRECCIÓN: Recargar datos en lugar de recargar toda la página
+      await loadPropiedades();
+      
     } catch (error) {
       console.error('Error saving property:', error);
       alert(`Error al guardar: ${error.message}`);
     } finally {
       setOperando(false);
-      location.reload()
     }
   };
 
   const handleCancelForm = () => {
     setShowForm(false);
     setEditingProperty(null);
+  };
+
+  const handleCloseDetails = () => {
+    setShowDetails(false);
+    setViewingProperty(null);
   };
 
   if (cargando) {
@@ -208,6 +213,8 @@ const PropiedadesSection = () => {
                     className={`px-2 py-1 rounded-full text-xs font-semibold ${
                       prop.estadoVenta === "Disponible"
                         ? "bg-green-100 text-green-800"
+                        : prop.estadoVenta === "Reservado"
+                        ? "bg-yellow-100 text-yellow-800"
                         : "bg-red-100 text-red-800"
                     }`}
                   >
@@ -225,7 +232,7 @@ const PropiedadesSection = () => {
                     </button>
                     <button
                       onClick={() => handleEdit(prop.id)}
-                      // disabled={operando}
+                      disabled={operando}
                       className="text-green-600 hover:text-green-800 p-1 rounded hover:bg-green-50 disabled:opacity-50"
                       title="Editar"
                     >
@@ -233,7 +240,7 @@ const PropiedadesSection = () => {
                     </button>
                     <button
                       onClick={() => handleDelete(prop.id)}
-                      // disabled={operando}
+                      disabled={operando}
                       className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 disabled:opacity-50"
                       title="Eliminar"
                     >
@@ -257,92 +264,36 @@ const PropiedadesSection = () => {
         </table>
       </div>
 
-      {/* Modal de detalles - Placeholder */}
-      {showDetails && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full p-6 max-h-screen overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">Detalles de la Propiedad</h3>
-              <button
-                onClick={() => {
-                  setShowDetails(false);
-                  setViewingProperty(null);
-                }}
-                className="p-2 hover:bg-gray-100 rounded-full"
-              >
-                <X size={24} />
-              </button>
-            </div>
-            <p className="text-gray-600 mb-4">
-              <PropertyForm
-                initialData={editingProperty || {}}
-                onCancel={handleCancelForm}
-                onSubmit={handleFormSubmit}
-              />
-            </p>
-            <div className="flex justify-end">
-              <button
-                onClick={() => {
-                  setShowDetails(false);
-                  setViewingProperty(null);
-                }}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de formulario - Placeholder */}
+      {/* 🔥 CORRECCIÓN: Modal de formulario SOLO para crear/editar */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full p-6 max-h-screen overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
+          <div className="bg-white rounded-lg max-w-6xl w-full max-h-screen overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b p-6 flex justify-between items-center z-10">
               <h3 className="text-xl font-bold">
                 {editingProperty ? 'Editar Propiedad' : 'Nueva Propiedad'}
               </h3>
               <button
                 onClick={handleCancelForm}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                disabled={operando}
+                className="p-2 hover:bg-gray-100 rounded-full disabled:opacity-50"
               >
                 <X size={24} />
               </button>
             </div>
-            <p className="text-gray-600 mb-4">
-              <PropertyForm
-                initialData={editingProperty || {}}
-                onCancel={handleCancelForm}
-                onSubmit={handleFormSubmit}
-              />
-            </p>
-            {/* <div className="flex gap-2 justify-end">
-              <button
-                onClick={handleCancelForm}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => handleFormSubmit({})}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Guardar
-              </button>
-            </div> */}
+            <PropertyForm
+              initialData={editingProperty || {}}
+              onCancel={handleCancelForm}
+              onSubmit={handleFormSubmit}
+            />
           </div>
         </div>
       )}
 
-      {/* Modal de detalles */}
-      {showDetails && (
+      {/* 🔥 CORRECCIÓN: Modal de detalles SOLO para ver */}
+      {showDetails && viewingProperty && (
         <PropertyDetailsModal
           property={viewingProperty}
-          onClose={() => {
-            setShowDetails(false);
-            setViewingProperty(null);
-          }}
+          onClose={handleCloseDetails}
         />
       )}
 

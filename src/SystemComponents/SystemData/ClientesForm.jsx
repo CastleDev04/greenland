@@ -163,7 +163,7 @@ const handleSubmit = async () => {
 
   // Limpiar campos undefined para que no se envíen
   Object.keys(dataToSubmit).forEach(key => {
-    if (dataToSubmit[key] === undefined || dataToSubmit[key] === '') {
+    if (dataToSubmit[key] === undefined) {
       delete dataToSubmit[key];
     }
   });

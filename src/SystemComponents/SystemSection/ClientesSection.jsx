@@ -9,6 +9,7 @@ import { useToast } from '../../hook/useToast';
 const ClientesSection = () => {
   const { 
     clientes, 
+    lotes,
     loading, 
     error, 
     createCliente, 
@@ -29,40 +30,58 @@ const ClientesSection = () => {
 
   const { toast, showToast, hideToast } = useToast();
 
-  // CORRECCIÓN: useEffect con dependencias vacías para ejecutar solo una vez
   useEffect(() => {
     console.log('🔍 useEffect ejecutándose (solo una vez)');
     refetch();
-  }, []); // ← Array de dependencias VACÍO
+  }, []);
 
+  // 🔥 CORREGIDO - Usar clienteData.nombre en lugar de newCliente.nombre
   const handleCreateCliente = async (clienteData) => {
     try {
-      const newCliente = await createCliente(clienteData);
-      showToast(`Cliente ${newCliente.nombre} creado exitosamente`, 'success');
-      // No llamar refetch aquí porque createCliente ya actualiza el estado local
+      await createCliente(clienteData);
+      console.log('✅ Cliente creado con datos:', clienteData);
+      
+      // Recargar datos del servidor
+      await refetch();
+      
+      // 🔥 CORRECCIÓN: Usar clienteData.nombre (del formulario)
+      showToast(`Cliente ${clienteData.nombre} creado exitosamente`, 'success');
     } catch (error) {
+      console.error('❌ Error al crear cliente:', error);
       showToast(error.message || 'Error al crear cliente', 'error');
     }
   };
 
+  // 🔥 CORREGIDO - Usar clienteData.nombre en lugar de updatedCliente.nombre
   const handleUpdateCliente = async (clienteData) => {
     try {
-      const updatedCliente = await updateCliente(editingCliente.id, clienteData);
-      showToast(`Cliente ${updatedCliente.nombre} actualizado`, 'success');
-      // No llamar refetch aquí porque updateCliente ya actualiza el estado local
+      await updateCliente(editingCliente.id, clienteData);
+      console.log('✅ Cliente actualizado con datos:', clienteData);
+      
+      // Recargar datos del servidor
+      await refetch();
+      
+      // 🔥 CORRECCIÓN: Usar clienteData.nombre (del formulario)
+      showToast(`Cliente ${clienteData.nombre} actualizado correctamente`, 'success');
     } catch (error) {
+      console.error('❌ Error al actualizar cliente:', error);
       showToast(error.message || 'Error al actualizar cliente', 'error');
     }
   };
 
+  // ✅ Esta función está bien - usa cliente.nombre que sí existe
   const handleDeleteCliente = async (cliente) => {
-    if (!window.confirm(`¿Eliminar a ${cliente.nombre}?`)) return;
+    if (!window.confirm(`¿Estás seguro de eliminar a ${cliente.nombre} ${cliente.apellido}?`)) return;
     
     try {
       await deleteCliente(cliente.id);
+      
+      // Recargar datos del servidor
+      await refetch();
+      
       showToast(`Cliente ${cliente.nombre} eliminado`, 'success');
-      // No llamar refetch aquí porque deleteCliente ya actualiza el estado local
     } catch (error) {
+      console.error('❌ Error al eliminar cliente:', error);
       showToast(error.message || 'Error al eliminar cliente', 'error');
     }
   };
@@ -72,17 +91,17 @@ const ClientesSection = () => {
     await handleFormSubmit(clienteData, submitFunction);
   };
 
-  // Función para recargar manualmente si es necesario
+  // Función para recarga manual
   const handleManualRefresh = () => {
     console.log('🔄 Recarga manual solicitada');
     refetch();
   };
 
-  if (loading) {
+  if (loading && clientes.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600">Cargando clientes...</span>
+        <span className="ml-3 text-gray-600">Cargando clientes y lotes...</span>
       </div>
     );
   }
@@ -91,12 +110,11 @@ const ClientesSection = () => {
     <div className="p-6">
       <ClienteList
         clientes={clientes}
-        loading={loading}
-        error={error}
+        lotes={lotes}
         onCreateClick={openCreateForm}
         onEditClick={openEditForm}
         onDeleteClick={handleDeleteCliente}
-        onRefresh={handleManualRefresh} // ← Recarga manual, no automática
+        onRefresh={handleManualRefresh}
       />
       
       {isFormOpen && (

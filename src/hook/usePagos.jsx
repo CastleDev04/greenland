@@ -24,10 +24,13 @@ export const usePagos = (ventaId = null) => {
         } else {
           data = await pagosService.getAll();
         }
-        setPagos(data);
+        
+        // Asegurarnos de que siempre sea un array
+        setPagos(Array.isArray(data) ? data : []);
       } catch (err) {
         setError(err.message || 'Error al cargar los pagos');
         console.error('Error al cargar pagos:', err);
+        setPagos([]); // Resetear a array vacío en caso de error
       } finally {
         setLoading(false);
       }
@@ -41,11 +44,13 @@ export const usePagos = (ventaId = null) => {
     setLoading(true);
     setError(null);
     try {
-      const newPago = await pagosService.create(pagoData);
+      const result = await pagosService.create(pagoData);
+      const newPago = result.pago || result.data || result;
+      
       setPagos(prev => [...prev, newPago]);
       return { success: true, data: newPago };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al crear el pago';
+      const errorMessage = err.message || 'Error al crear el pago';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -58,13 +63,15 @@ export const usePagos = (ventaId = null) => {
     setLoading(true);
     setError(null);
     try {
-      const updatedPago = await pagosService.update(id, pagoData);
+      const result = await pagosService.update(id, pagoData);
+      const updatedPago = result.pago || result.data || result;
+      
       setPagos(prev => 
         prev.map(pago => pago.id === id ? updatedPago : pago)
       );
       return { success: true, data: updatedPago };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al actualizar el pago';
+      const errorMessage = err.message || 'Error al actualizar el pago';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -81,7 +88,7 @@ export const usePagos = (ventaId = null) => {
       setPagos(prev => prev.filter(pago => pago.id !== id));
       return { success: true };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al eliminar el pago';
+      const errorMessage = err.message || 'Error al eliminar el pago';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -94,10 +101,11 @@ export const usePagos = (ventaId = null) => {
     setLoading(true);
     setError(null);
     try {
-      const pago = await pagosService.getById(id);
+      const result = await pagosService.getById(id);
+      const pago = result.pago || result.data || result;
       return { success: true, data: pago };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al obtener el pago';
+      const errorMessage = err.message || 'Error al obtener el pago';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -110,19 +118,42 @@ export const usePagos = (ventaId = null) => {
     setLoading(true);
     setError(null);
     try {
-      const updatedPago = await pagosService.uploadComprobante(id, file);
+      const result = await pagosService.uploadComprobante(id, file);
+      const updatedPago = result.pago || result.data || result;
+      
       setPagos(prev => 
         prev.map(pago => pago.id === id ? updatedPago : pago)
       );
       return { success: true, data: updatedPago };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Error al subir el comprobante';
+      const errorMessage = err.message || 'Error al subir el comprobante';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
     }
   };
+
+  // Simular pago
+  const simularPago = async (simulacionData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await pagosService.simularPago(simulacionData);
+      return { success: true, data: result };
+    } catch (err) {
+      const errorMessage = err.message || 'Error al simular el pago';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔥 NUEVO: Calcular total de pagos
+  const calcularTotalPagos = useCallback(() => {
+    return pagos.reduce((total, pago) => total + (parseFloat(pago.monto) || 0), 0);
+  }, [pagos]);
 
   return {
     pagos,
@@ -133,6 +164,8 @@ export const usePagos = (ventaId = null) => {
     deletePago,
     getPagoById,
     uploadComprobante,
+    simularPago,
     refresh,
+    calcularTotalPagos // 🔥 NUEVO
   };
 };

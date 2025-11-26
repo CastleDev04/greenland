@@ -49,6 +49,11 @@ const PropertyForm = ({ initialData = {}, onCancel, onSubmit }) => {
 
   const [errors, setErrors] = useState({});
 
+  // 🔥 CORRECCIÓN: Función segura para obtener array
+  const getSafeArray = (field) => {
+    return Array.isArray(formData[field]) ? formData[field] : [];
+  };
+
   const handleChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -60,8 +65,12 @@ const PropertyForm = ({ initialData = {}, onCancel, onSubmit }) => {
     }
   };
 
+  // 🔥 CORRECCIÓN: Función segura para manejar arrays
   const handleArrayChange = (field, value) => {
-    const arrayValue = value.split(",").map((v) => v.trim()).filter(v => v !== "");
+    const arrayValue = value 
+      ? value.split(",").map((v) => v.trim()).filter(v => v !== "")
+      : [];
+    
     setFormData((prev) => ({
       ...prev,
       [field]: arrayValue,
@@ -246,23 +255,25 @@ const PropertyForm = ({ initialData = {}, onCancel, onSubmit }) => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* 🔥 CORREGIDO: Beneficios Comunes con protección de array */}
             <div className="flex flex-col">
               <label className="text-sm font-medium mb-1">Beneficios Comunes</label>
               <input
                 type="text"
                 placeholder="Separados por coma (ej: piscina, gimnasio, parque)"
-                value={formData.beneficiosComunes.join(", ")}
+                value={getSafeArray("beneficiosComunes").join(", ")}
                 onChange={(e) => handleArrayChange("beneficiosComunes", e.target.value)}
                 className="border p-2 rounded w-full border-gray-300"
               />
             </div>
             
+            {/* 🔥 CORREGIDO: Restricciones de Construcción con protección de array */}
             <div className="flex flex-col">
               <label className="text-sm font-medium mb-1">Restricciones de Construcción</label>
               <input
                 type="text"
                 placeholder="Separadas por coma"
-                value={formData.restriccionConstrucion.join(", ")}
+                value={getSafeArray("restriccionConstrucion").join(", ")}
                 onChange={(e) => handleArrayChange("restriccionConstrucion", e.target.value)}
                 className="border p-2 rounded w-full border-gray-300"
               />
@@ -341,7 +352,7 @@ const PropertyForm = ({ initialData = {}, onCancel, onSubmit }) => {
             <input
               type="text"
               placeholder="URLs separadas por coma"
-              value={formData.imagenes.join(", ")}
+              value={getSafeArray("imagenes").join(", ")}
               onChange={(e) => handleArrayChange("imagenes", e.target.value)}
               className="border p-2 rounded w-full border-gray-300"
             />
