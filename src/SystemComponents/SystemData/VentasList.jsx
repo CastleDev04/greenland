@@ -316,7 +316,8 @@ const VentasList = ({
           <span className="font-medium">{estadoConfig.label}</span>
         </div>
         
-        {onEdit && venta.estado === 'pendiente' && (
+        {/* 🔥 BOTÓN EDITAR - SIEMPRE VISIBLE EN DETALLE TAMBIÉN */}
+        {onEdit && (
           <button
             onClick={() => onEdit(venta)}
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -1015,27 +1016,32 @@ const VentasList = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end gap-2">
+                      {/* 🔥 BOTÓN VER - SIEMPRE VISIBLE */}
                       <button
                         onClick={() => handleView(venta)}
-                        className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                        className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors"
                         title="Ver detalles"
                       >
                         <Eye size={16} />
                       </button>
-                      {onEdit && venta.estado === 'pendiente' && (
+
+                      {/* 🔥 BOTÓN EDITAR - SIEMPRE VISIBLE */}
+                      {onEdit && (
                         <button
                           onClick={() => onEdit(venta)}
-                          className="text-yellow-600 hover:text-yellow-900 p-1 rounded hover:bg-yellow-50"
+                          className="text-yellow-600 hover:text-yellow-900 p-1 rounded hover:bg-yellow-50 transition-colors"
                           title="Editar venta"
                         >
                           <Edit size={16} />
                         </button>
                       )}
-                      {onDelete && venta.estado !== 'pagado' && (
+
+                      {/* 🔥 BOTÓN ELIMINAR - SIEMPRE VISIBLE */}
+                      {onDelete && (
                         <button
                           onClick={() => onDelete(venta)}
-                          className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
-                          title="Cancelar venta"
+                          className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors"
+                          title="Eliminar venta"
                         >
                           <Trash2 size={16} />
                         </button>

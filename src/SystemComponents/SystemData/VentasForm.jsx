@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   AlertCircle, DollarSign, Calendar, User, MapPin, CreditCard, 
-  X, CheckCircle, Clock, XCircle, FileText, Percent, AlertTriangle 
+  X, CheckCircle, Clock, XCircle, Percent, Edit, Trash2
 } from 'lucide-react';
 
 // Mover constantes fuera del componente
@@ -11,7 +11,7 @@ const ESTADOS_VENTA = [
   { value: 'cancelado', label: 'Cancelado', icon: XCircle, color: 'red' }
 ];
 
-const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = false, ventaData = null }) => {
+const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = false, ventaData = null, onEdit, onDelete }) => {
   // Estado inicial memoizado
   const initialState = useMemo(() => ({
     cliente_id: '',
@@ -21,18 +21,18 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
     tipoPago: 'Contado',
     cantidadCuotas: '',
     montoCuota: '',
-    fechaInicio: '',
+    fechaInicio: new Date().toISOString().split('T')[0], // Fecha actual por defecto
     tasaInteresMoratorio: '',
     multaMoraDiaria: '',
     comprobante: '',
     observaciones: '',
-    diaVencimiento: ''
+    diaVencimiento: '10' // Valor por defecto
   }), []);
 
   const [formData, setFormData] = useState(initialState);
   const [loteSeleccionado, setLoteSeleccionado] = useState(null);
   const [errors, setErrors] = useState({});
-  const [mostrarCamposAvanzados, setMostrarCamposAvanzados] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Inicializar formData cuando ventaData cambia
   useEffect(() => {
@@ -45,12 +45,12 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
         tipoPago: ventaData.tipoPago || 'Contado',
         cantidadCuotas: ventaData.cantidadCuotas?.toString() || '',
         montoCuota: ventaData.montoCuota?.toString() || '',
-        fechaInicio: ventaData.fechaInicio || '',
+        fechaInicio: ventaData.fechaInicio || new Date().toISOString().split('T')[0],
         tasaInteresMoratorio: ventaData.tasaInteresMoratorio?.toString() || '',
         multaMoraDiaria: ventaData.multaMoraDiaria?.toString() || '',
         comprobante: ventaData.comprobante || '',
         observaciones: ventaData.observaciones || '',
-        diaVencimiento: ventaData.diaVencimiento?.toString() || ''
+        diaVencimiento: ventaData.diaVencimiento?.toString() || '10'
       });
     }
   }, [ventaData]);
@@ -62,18 +62,6 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
       setLoteSeleccionado(lote || null);
     }
   }, [formData.lote_id, lotes]);
-
-  // Auto-mostrar campos avanzados
-  useEffect(() => {
-    if (ventaData && (
-      ventaData.tasaInteresMoratorio || 
-      ventaData.multaMoraDiaria || 
-      ventaData.comprobante || 
-      ventaData.observaciones
-    )) {
-      setMostrarCamposAvanzados(true);
-    }
-  }, [ventaData]);
 
   // Handlers optimizados
   const handleBackdropClick = useCallback((e) => {
@@ -138,12 +126,8 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
     setFormData(prev => ({
       ...prev,
       tipoPago,
-      cantidadCuotas: tipoPago === 'Contado' ? '' : prev.cantidadCuotas,
-      montoCuota: tipoPago === 'Contado' ? '' : prev.montoCuota,
-      fechaInicio: tipoPago === 'Contado' ? '' : prev.fechaInicio,
-      tasaInteresMoratorio: tipoPago === 'Contado' ? '' : prev.tasaInteresMoratorio,
-      multaMoraDiaria: tipoPago === 'Contado' ? '' : prev.multaMoraDiaria,
-      diaVencimiento: tipoPago === 'Contado' ? '' : prev.diaVencimiento
+      cantidadCuotas: tipoPago === 'Contado' ? '1' : prev.cantidadCuotas,
+      montoCuota: tipoPago === 'Contado' ? prev.montoTotal : prev.montoCuota
     }));
   }, []);
 
@@ -161,7 +145,7 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
     });
   }, []);
 
-  // 🔥 CORRECCIÓN: Validación sin restricción de fecha pasada
+  // Validación actualizada
   const validateForm = useCallback(() => {
     const newErrors = {};
 
@@ -170,6 +154,11 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
     if (!formData.lote_id) newErrors.lote_id = 'Debe seleccionar un lote';
     if (!formData.montoTotal || parseFloat(formData.montoTotal) <= 0) {
       newErrors.montoTotal = 'Monto total debe ser mayor a 0';
+    }
+
+    // 🔥 NUEVA VALIDACIÓN: fechaInicio es REQUERIDA siempre
+    if (!formData.fechaInicio) {
+      newErrors.fechaInicio = 'La fecha de inicio es requerida';
     }
 
     // Validaciones específicas de crédito
@@ -184,8 +173,14 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
         newErrors.montoCuota = 'Monto de cuota debe ser mayor a 0';
       }
 
-      if (!formData.fechaInicio) {
-        newErrors.fechaInicio = 'La fecha de inicio es requerida para crédito';
+      // 🔥 NUEVA VALIDACIÓN: diaVencimiento obligatorio para crédito
+      if (!formData.diaVencimiento) {
+        newErrors.diaVencimiento = 'El día de vencimiento es requerido para crédito';
+      } else {
+        const diaVencimiento = parseInt(formData.diaVencimiento);
+        if (diaVencimiento < 1 || diaVencimiento > 31) {
+          newErrors.diaVencimiento = 'El día de vencimiento debe estar entre 1 y 31';
+        }
       }
 
       const tasaInteres = parseFloat(formData.tasaInteresMoratorio || 0);
@@ -194,18 +189,13 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
 
       const multaMora = parseFloat(formData.multaMoraDiaria || 0);
       if (multaMora < 0) newErrors.multaMoraDiaria = 'La multa de mora no puede ser negativa';
-
-      const diaVencimiento = parseInt(formData.diaVencimiento || 0);
-      if (diaVencimiento && (diaVencimiento < 1 || diaVencimiento > 31)) {
-        newErrors.diaVencimiento = 'El día de vencimiento debe estar entre 1 y 31';
-      }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData]);
 
-  // 🔥 CORRECCIÓN: Handler de submit con estructura correcta
+  // Handler de submit actualizado
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
     
@@ -220,18 +210,25 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
       montoTotal: parseFloat(formData.montoTotal),
       estado: formData.estado,
       tipoPago: formData.tipoPago,
-      compradorId: parseInt(formData.cliente_id) // 🔥 AGREGADO: compradorId
+      fechaInicio: formData.fechaInicio, // 🔥 AHORA SIEMPRE SE ENVÍA
+      compradorId: parseInt(formData.cliente_id)
     };
 
     // Agregar campos opcionales solo si tienen valor
     if (formData.comprobante) ventaDataToSubmit.comprobante = formData.comprobante;
     if (formData.observaciones) ventaDataToSubmit.observaciones = formData.observaciones;
 
-    // Campos específicos de crédito
-    if (formData.tipoPago === 'Credito') {
+    // Campos específicos por tipo de pago
+    if (formData.tipoPago === 'Contado') {
+      // Para contado, establecer valores por defecto
+      ventaDataToSubmit.cantidadCuotas = 1;
+      ventaDataToSubmit.montoCuota = parseFloat(formData.montoTotal);
+      ventaDataToSubmit.diaVencimiento = parseInt(formData.diaVencimiento || 10);
+    } else if (formData.tipoPago === 'Credito') {
+      // Para crédito, usar los valores del formulario
       ventaDataToSubmit.cantidadCuotas = parseInt(formData.cantidadCuotas);
       ventaDataToSubmit.montoCuota = parseFloat(formData.montoCuota);
-      ventaDataToSubmit.fechaInicio = formData.fechaInicio;
+      ventaDataToSubmit.diaVencimiento = parseInt(formData.diaVencimiento);
 
       if (formData.tasaInteresMoratorio) {
         ventaDataToSubmit.tasaInteresMoratorio = parseFloat(formData.tasaInteresMoratorio);
@@ -239,14 +236,33 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
       if (formData.multaMoraDiaria) {
         ventaDataToSubmit.multaMoraDiaria = parseFloat(formData.multaMoraDiaria);
       }
-      if (formData.diaVencimiento) {
-        ventaDataToSubmit.diaVencimiento = parseInt(formData.diaVencimiento);
-      }
     }
 
     console.log('📤 Datos de venta a enviar:', ventaDataToSubmit);
     onSubmit(ventaDataToSubmit);
   }, [formData, validateForm, onSubmit]);
+
+  // Handlers para editar y eliminar
+  const handleEdit = useCallback(() => {
+    if (onEdit && ventaData) {
+      onEdit(ventaData);
+    }
+  }, [onEdit, ventaData]);
+
+  const handleDelete = useCallback(() => {
+    if (onDelete && ventaData) {
+      onDelete(ventaData.id);
+      setShowDeleteConfirm(false);
+    }
+  }, [onDelete, ventaData]);
+
+  const confirmDelete = useCallback(() => {
+    setShowDeleteConfirm(true);
+  }, []);
+
+  const cancelDelete = useCallback(() => {
+    setShowDeleteConfirm(false);
+  }, []);
 
   // Renderizado del formulario
   return (
@@ -259,13 +275,36 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
           <h2 className="text-2xl font-bold text-gray-900">
             {ventaData ? 'Editar Venta' : 'Nueva Venta'}
           </h2>
-          <button
-            onClick={onCancel}
-            disabled={loading}
-            className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
-          >
-            <X size={24} />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Botones de Editar y Eliminar solo en modo edición */}
+            {ventaData && (
+              <>
+                <button
+                  onClick={handleEdit}
+                  disabled={loading}
+                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                  title="Editar venta"
+                >
+                  <Edit size={20} />
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={loading}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                  title="Eliminar venta"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </>
+            )}
+            <button
+              onClick={onCancel}
+              disabled={loading}
+              className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
         <div className="p-6">
@@ -434,7 +473,7 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
               </div>
             </div>
 
-            {/* Sección Pago */}
+            {/* Sección Pago - ACTUALIZADA */}
             <div className="bg-yellow-50 p-6 rounded-lg">
               <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                 <CreditCard className="mr-2 text-yellow-600" size={24} />
@@ -485,6 +524,28 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
                       </div>
                     </label>
                   </div>
+                </div>
+
+                {/* 🔥 NUEVO: Fecha Inicio para AMBOS tipos de pago */}
+                <div className="bg-white p-4 rounded-lg border">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Fecha de Inicio *
+                  </label>
+                  <input
+                    type="date"
+                    name="fechaInicio"
+                    value={formData.fechaInicio}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
+                      errors.fechaInicio ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.fechaInicio && (
+                    <p className="text-red-600 text-sm mt-1 flex items-center">
+                      <AlertCircle size={16} className="mr-1" />
+                      {errors.fechaInicio}
+                    </p>
+                  )}
                 </div>
 
                 {formData.tipoPago === 'Credito' && (
@@ -540,27 +601,30 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Fecha Inicio *
+                          Día de Vencimiento *
                         </label>
                         <input
-                          type="date"
-                          name="fechaInicio"
-                          value={formData.fechaInicio}
+                          type="number"
+                          name="diaVencimiento"
+                          value={formData.diaVencimiento}
                           onChange={handleInputChange}
+                          min="1"
+                          max="31"
                           className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.fechaInicio ? 'border-red-500' : 'border-gray-300'
+                            errors.diaVencimiento ? 'border-red-500' : 'border-gray-300'
                           }`}
+                          placeholder="Ej: 5 (día del mes)"
                         />
-                        {errors.fechaInicio && (
+                        {errors.diaVencimiento && (
                           <p className="text-red-600 text-sm mt-1 flex items-center">
                             <AlertCircle size={16} className="mr-1" />
-                            {errors.fechaInicio}
+                            {errors.diaVencimiento}
                           </p>
                         )}
                       </div>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                    <div className="grid md:grid-cols-2 gap-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Tasa Interés Moratorio (%)
@@ -612,33 +676,46 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
                           </p>
                         )}
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Día de Vencimiento
-                        </label>
-                        <input
-                          type="number"
-                          name="diaVencimiento"
-                          value={formData.diaVencimiento}
-                          onChange={handleInputChange}
-                          min="1"
-                          max="31"
-                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                            errors.diaVencimiento ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                          placeholder="Ej: 5"
-                        />
-                        {errors.diaVencimiento && (
-                          <p className="text-red-600 text-sm mt-1 flex items-center">
-                            <AlertCircle size={16} className="mr-1" />
-                            {errors.diaVencimiento}
-                          </p>
-                        )}
-                      </div>
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Sección Observaciones */}
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                Información Adicional
+              </h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Comprobante
+                  </label>
+                  <input
+                    type="text"
+                    name="comprobante"
+                    value={formData.comprobante}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                    placeholder="Número o referencia de comprobante"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Observaciones
+                  </label>
+                  <textarea
+                    name="observaciones"
+                    value={formData.observaciones}
+                    onChange={handleInputChange}
+                    rows="3"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+                    placeholder="Observaciones adicionales..."
+                  />
+                </div>
               </div>
             </div>
 
@@ -669,6 +746,33 @@ const VentasForm = ({ onSubmit, onCancel, clientes = [], lotes = [], loading = f
           </form>
         </div>
       </div>
+
+      {/* Modal de confirmación para eliminar */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-60">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Confirmar Eliminación</h3>
+            <p className="text-gray-600 mb-4">
+              ¿Estás seguro de que quieres eliminar esta venta? Esta acción no se puede deshacer.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center"
+              >
+                <Trash2 size={16} className="mr-2" />
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
