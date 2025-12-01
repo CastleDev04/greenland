@@ -4,10 +4,11 @@ export default function Admin({ setCurrentSection }) {
   const navItems = [
     { name: 'Gestión de Propiedades', key: 'propiedades' },
     { name: 'Fraccionamiento', key: 'fraccionamiento' },
+    { name: 'Clientes', key: 'clientes' },
     { name: 'Ventas', key: 'ventas' },
     { name: 'Pagos y Financiamiento', key: 'pagos' },
-    { name: 'Clientes', key: 'clientes' },
     { name: 'Reportes', key: 'reportes' },
+    { name: "Promociones", key: "promociones" },
     { name: 'Usuarios', key: 'usuarios' },
   ];
 
