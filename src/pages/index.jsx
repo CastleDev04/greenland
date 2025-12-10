@@ -4,6 +4,7 @@ import LoteamientoList from "../components/LoteamientoList"
 import PropiedadesList from "../components/PropiedadesList"
 import Foter from "../components/Footer"
 import PromocionSection from "../components/PromocionSection.jsx";
+import NoticiasSection from "../components/NoticiasSection.jsx";
 
 export default function Index() {
     return(
@@ -15,6 +16,7 @@ export default function Index() {
                 <LoteamientoList/>
                 <PromocionSection />
                 <PropiedadesList/>
+                <NoticiasSection />
                 <Foter></Foter>
             </div>
         </>

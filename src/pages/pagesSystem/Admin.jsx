@@ -9,6 +9,7 @@ export default function Admin({ setCurrentSection }) {
     { name: 'Pagos y Financiamiento', key: 'pagos' },
     { name: 'Reportes', key: 'reportes' },
     { name: "Promociones", key: "promociones" },
+    { name: "Noticias", key: "noticias" },
     { name: 'Usuarios', key: 'usuarios' },
   ];
 

@@ -20,6 +20,7 @@ import VentasSection from './SystemComponents/SystemSection/VentasSection.jsx';
 import PagosSection from './SystemComponents/SystemSection/PagosSection.jsx';
 import UsuariosSection from './SystemComponents/SystemSection/UsuariosSection.jsx';
 import PromocionesSection from './SystemComponents/SystemSection/PromocionesSection.jsx';
+import NoticiasSection from './SystemComponents/SystemSection/NoticiasSection.jsx'
 
 
 
@@ -42,6 +43,8 @@ function App() {
         return <h1>Seccion de reportes</h1>;
       case "promociones":
         return <PromocionesSection/>
+        case "noticias":
+        return <NoticiasSection/>
       case 'usuarios':
         return <UsuariosSection/>;
       default:

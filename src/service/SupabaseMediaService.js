@@ -5,19 +5,25 @@ export class SupabaseMediaService {
   
   static getBucketConfig(file) {
     const isVideo = file.type.startsWith('video/');
+    // Determinar el tipo de contenido basado en el contexto
+    const isNoticia = file.name.includes('noticia') || 
+                      (typeof window !== 'undefined' && 
+                       window.location.pathname.includes('noticias'));
+    
     return {
       bucket: 'media',
-      folder: isVideo ? 'videos_promos' : 'imagenes_promos',
+      folder: isNoticia ? 'imagenes_noticias' : 
+              (isVideo ? 'videos_promos' : 'imagenes_promos'),
       tipo: isVideo ? 'video' : 'imagen'
     };
   }
 
-  static async uploadFile(file, promocionId) {
+  static async uploadFile(file, identifier) {
     try {
       const { folder, tipo } = this.getBucketConfig(file);
       
       const fileExt = file.name.split('.').pop();
-      const fileName = `${promocionId}-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const fileName = `${identifier}-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${folder}/${fileName}`;
 
       const { data, error } = await supabase.storage
@@ -42,6 +48,9 @@ export class SupabaseMediaService {
       throw error;
     }
   }
+
+
+  
 
   static async deleteFile(filePath) {
     try {
