@@ -35,67 +35,61 @@ const PagosService = {
   // 🔥 VERSIÓN CORREGIDA - SUMA MONTOS CORRECTAMENTE
 async actualizarContadorCuotas(ventaId) {
   try {
-    console.log(`🔄 [DEBUG 1] Iniciando actualización para venta: ${ventaId}`);
-    
-    // 1. Obtener todos los pagos de esta venta
-    console.log(`📊 [DEBUG 2] Obteniendo pagos de venta ${ventaId}...`);
-    const pagos = await this.getByVenta(ventaId);
-    console.log(`📊 [DEBUG 3] Pagos obtenidos:`, pagos);
-    
-    const cuotasPagadas = pagos.length;
-    
-    // 🔥 CORRECCIÓN CRÍTICA: Calcular monto total pagado SUMANDO todos los pagos
-    const montoTotalPagado = pagos.reduce((total, pago) => {
-      const montoPago = parseFloat(pago.monto) || 0;
-      console.log(`💰 Sumando pago ${pago.id}: ${montoPago}`);
-      return total + montoPago;
-    }, 0);
-    
-    console.log(`📊 [DEBUG 4] Resumen: ${cuotasPagadas} pagos, ${montoTotalPagado} Gs.`);
+    console.log(`🔄 [DEBUG] Iniciando actualización para venta: ${ventaId}`);
 
-    // 2. Obtener datos de la venta actual
-    console.log(`📋 [DEBUG 5] Obteniendo datos de venta ${ventaId}...`);
+    const pagos = await this.getByVenta(ventaId);
+    console.log(`🔍 Pagos obtenidos para venta ${ventaId}:`, pagos);
+
+    const isPagoCompletado = (pago) => {
+      if (!pago) return false;
+      return Boolean(
+        pago.fechaPago ||
+        pago.tipoPago ||
+        (pago.estado && pago.estado.toLowerCase() === 'pagado')
+      );
+    };
+
+    const pagosCompletados = pagos.filter(isPagoCompletado);
+    const cuotasPagadas = pagosCompletados.length;
+    const montoTotalPagado = pagosCompletados.reduce((total, pago) => {
+      return total +
+        (parseFloat(pago.monto) || 0) +
+        (parseFloat(pago.interes) || 0) +
+        (parseFloat(pago.multa) || 0);
+    }, 0);
+
+    console.log(`📊 Pagos completados: ${cuotasPagadas}, monto total pagado: ${montoTotalPagado}`);
+
     const ventaResponse = await fetch(`${API_BASE_URL}/ventas/${ventaId}`, {
       method: 'GET',
       headers: this.getHeaders()
     });
-    
-    console.log(`📋 [DEBUG 6] Respuesta venta - Status:`, ventaResponse.status);
     const ventaResult = await this.handleResponse(ventaResponse);
     const venta = ventaResult.venta || ventaResult.data || ventaResult;
-    console.log('📋 [DEBUG 7] Datos actuales de venta:', venta);
 
     if (!venta) {
       throw new Error('Venta no encontrada');
     }
 
-    const totalCuotas = venta.cantidadCuotas || 0;
     const montoTotalVenta = parseFloat(venta.montoTotal) || 0;
-
-    // 🔥 VERIFICACIÓN: Comparar con monto_pagado actual para debug
     const montoPagadoActual = parseFloat(venta.monto_pagado) || 0;
-    console.log(`🔍 COMPARACIÓN: Monto pagado actual: ${montoPagadoActual}, Calculado: ${montoTotalPagado}`);
+    console.log(`🔍 Venta actual: monto_total=${montoTotalVenta}, monto_pagado=${montoPagadoActual}`);
 
-    // 3. Calcular nuevo estado
     let nuevoEstado = venta.estado || 'Pendiente';
-    
-    if (montoTotalPagado >= montoTotalVenta && montoTotalVenta > 0) {
+    if (venta.estado && venta.estado.toLowerCase() === 'cancelado') {
+      nuevoEstado = venta.estado;
+    } else if (montoTotalPagado >= montoTotalVenta && montoTotalVenta > 0) {
       nuevoEstado = 'Pagado';
-      console.log(`🎯 Cambiando estado a: ${nuevoEstado} (${montoTotalPagado} >= ${montoTotalVenta})`);
-    } else if (montoTotalPagado > 0 && nuevoEstado === 'Pendiente') {
+    } else {
       nuevoEstado = 'Pendiente';
-      console.log(`🎯 Manteniendo estado: ${nuevoEstado} (pagado parcialmente)`);
-    } else if (montoTotalPagado === 0) {
-      nuevoEstado = 'Pendiente';
-      console.log(`🎯 Estado: ${nuevoEstado} (sin pagos)`);
     }
 
-    // 🔥 CORRECCIÓN: FORMATO COMPATIBLE Y SEGURO
     const updateData = {
       estado: nuevoEstado,
       cuotas_pagadas: cuotasPagadas,
-      monto_pagado: montoTotalPagado.toFixed(2), // 🔥 ESTE ES EL MONTO CORRECTO SUMADO
-      // Mantener campos críticos para evitar errores de validación
+      cuotasPagadas,
+      monto_pagado: parseFloat(montoTotalPagado.toFixed(2)),
+      montoPagado: parseFloat(montoTotalPagado.toFixed(2)),
       montoTotal: venta.montoTotal,
       cantidadCuotas: venta.cantidadCuotas,
       tipoPago: venta.tipoPago,
@@ -103,45 +97,28 @@ async actualizarContadorCuotas(ventaId) {
       user_id: venta.user_id
     };
 
-    // 🔥 LIMPIAR CAMPOS PROBLEMÁTICOS
-    delete updateData.created_at;
-    delete updateData.updated_at;
-    delete updateData.deleted_at;
-    delete updateData.id;
+    console.log(`🔄 Actualizando venta #${ventaId} con datos:`, updateData);
 
-    console.log(`🔄 [DEBUG 8] Datos a enviar en actualización:`, updateData);
-
-    // 4. Actualizar venta con manejo mejorado de errores
-    console.log(`🔄 [DEBUG 9] Enviando actualización a la API...`);
     const updateResponse = await fetch(`${API_BASE_URL}/ventas/${ventaId}`, {
       method: 'PUT',
       headers: this.getHeaders(),
       body: JSON.stringify(updateData)
     });
 
-    console.log(`🔄 [DEBUG 10] Respuesta actualización - Status:`, updateResponse.status);
-    
     if (!updateResponse.ok) {
-      // 🔥 MANEJO DETALLADO DE ERRORES 422
       if (updateResponse.status === 422) {
         const errorText = await updateResponse.text();
-        console.error('❌ [DEBUG ERROR 422] Detalles del error:', errorText);
+        console.error('❌ Error 422 al actualizar venta:', errorText);
         throw new Error(`Error de validación en el backend: ${errorText}`);
       }
       throw new Error(`Error HTTP ${updateResponse.status}`);
     }
 
     const resultado = await updateResponse.json();
-    console.log(`✅ [DEBUG 11] Venta actualizada exitosamente:`, resultado);
-    
-    // 🔥 VERIFICACIÓN FINAL
-    console.log(`💰 RESUMEN FINAL: ${cuotasPagadas} cuotas, ${montoTotalPagado} Gs. pagados de ${montoTotalVenta} Gs.`);
-    
+    console.log(`✅ Venta #${ventaId} actualizada exitosamente.`);
     return resultado;
-
   } catch (error) {
-    console.error(`❌ [DEBUG ERROR] Error en actualizarContadorCuotas:`, error);
-    console.error(`❌ [DEBUG ERROR] Stack:`, error.stack);
+    console.error('❌ Error en actualizarContadorCuotas:', error);
     throw error;
   }
 },
@@ -208,11 +185,14 @@ async actualizarContadorCuotas(ventaId) {
       }
       
       // 1. Crear el pago
+      const pagoPayload = { ...pagoData };
+      delete pagoPayload.estado; // El backend de pagos no utiliza la columna `estado`
+
       console.log('💰 [DEBUG C] Creando pago en la API...');
       const response = await fetch(`${API_BASE_URL}/pagos`, {
         method: 'POST',
         headers: this.getHeaders(),
-        body: JSON.stringify(pagoData)
+        body: JSON.stringify(pagoPayload)
       });
 
       console.log('💰 [DEBUG D] Respuesta crear pago - Status:', response.status);
@@ -264,10 +244,13 @@ async actualizarContadorCuotas(ventaId) {
   // Actualizar pago - VERSIÓN CORREGIDA
   async update(id, pagoData) {
     try {
+      const pagoPayload = { ...pagoData };
+      delete pagoPayload.estado; // El backend de pagos no utiliza la columna `estado`
+
       const response = await fetch(`${API_BASE_URL}/pagos/${id}`, {
         method: 'PUT',
         headers: this.getHeaders(),
-        body: JSON.stringify(pagoData)
+        body: JSON.stringify(pagoPayload)
       });
 
       const pagoActualizado = await this.handleResponse(response);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import VentasForm from '../SystemData/VentasForm';
 import VentasList from '../SystemData/VentasList';
+import PagosSection from './PagosSection';
 import Toast from '../SystemData/Toast';
 import { useVentas } from '../../hook/useVentas.jsx';
 import { useVentaForm } from '../../hook/useVentaForm.js';
@@ -34,6 +35,7 @@ const VentasSection = () => {
 
   const [clientes, setClientes] = useState([]);
   const [lotes, setLotes] = useState([]);
+  const [ventaParaPagos, setVentaParaPagos] = useState(null);
   const [loadingData, setLoadingData] = useState(false);
   const [dataCargada, setDataCargada] = useState(false);
 
@@ -115,6 +117,14 @@ const VentasSection = () => {
     showToast(`Vista de venta #${venta.id}`, 'info');
   };
 
+  const handleShowPagos = (venta) => {
+    setVentaParaPagos(venta);
+  };
+
+  const handleClosePagos = () => {
+    setVentaParaPagos(null);
+  };
+
   const handleExportVentas = (ventasFiltradas) => {
     showToast(`Exportando ${ventasFiltradas.length} ventas`, 'info');
   };
@@ -162,7 +172,8 @@ const VentasSection = () => {
       <div className="mb-6 flex gap-4">
         <button
           onClick={openCreateForm}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center"
+          className="bg-blue-600 hover:bg-blue-70
+  const [clientes, setClientes] = useState([]);0 text-white px-6 py-3 rounded-lg font-medium flex items-center"
         >
           <Plus className="w-5 h-5 mr-2" />
           Nueva Venta
@@ -183,20 +194,35 @@ const VentasSection = () => {
         onView={handleViewVenta}
         onEdit={openEditForm}
         onDelete={handleDeleteVenta}
+        onShowPayments={handleShowPagos}
         onExport={handleExportVentas}
       />
 
       {isFormOpen && (
-        <VentasForm
-          onSubmit={handleFormSubmitWrapper}
-          onCancel={closeForm}
-          clientes={clientes}
-          lotes={lotes}
-          loading={formLoading}
-          ventaData={editingVenta}
-        />
-      )}
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    
+    <div className="bg-white w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-lg shadow-lg p-6">
+      
+      <VentasForm
+        onSubmit={handleFormSubmitWrapper}
+        onCancel={closeForm}
+        clientes={clientes}
+        lotes={lotes}
+        loading={formLoading}
+        ventaData={editingVenta}
+      />
 
+    </div>
+  </div>
+)}
+
+      {ventaParaPagos && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 p-4 overflow-y-auto">
+          <div className="w-full max-w-6xl rounded-3xl bg-white shadow-2xl ring-1 ring-black/10 overflow-hidden">
+            <PagosSection ventaId={ventaParaPagos.id} onClose={handleClosePagos} />
+          </div>
+        </div>
+      )}
       {toast && (
         <Toast
           message={toast.message}

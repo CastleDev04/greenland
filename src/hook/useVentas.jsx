@@ -33,8 +33,10 @@ export const useVentas = () => {
       console.log('📝 Creando nueva venta...');
       const response = await ventasService.createVenta(ventaData);
       
-      const nuevaVenta = response.venta || response;
+      // Manejar la nueva respuesta con { success, venta, cliente }
+      const nuevaVenta = response.venta || response.venta || response;
       console.log('✅ Venta creada:', nuevaVenta);
+      console.log('✅ Cliente asociado:', response.cliente?.nombre || 'N/A');
       
       setVentas(prev => [...prev, nuevaVenta]);
       
@@ -55,6 +57,7 @@ export const useVentas = () => {
       console.log(`📝 Actualizando venta #${id}...`);
       const response = await ventasService.updateVenta(id, ventaData);
       
+      // Manejar la estructura de respuesta mejorada
       const ventaActualizada = response.venta || response;
       console.log('✅ Venta actualizada:', ventaActualizada);
       

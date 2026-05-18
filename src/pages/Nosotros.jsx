@@ -120,29 +120,7 @@ export default function Nosotros() {
             </div>
 
             {/* Estadísticas */}
-            <div className="bg-gradient-to-r from-green-600 to-emerald-600 py-16 px-4">
-                <h2 className="font-display text-3xl md:text-4xl font-bold text-white text-center mb-12">
-                    Nuestros logros
-                </h2>
-                <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-                    <div className="text-center text-white">
-                        <p className="text-5xl md:text-6xl font-bold mb-2">10+</p>
-                        <p className="text-lg md:text-xl">Años de experiencia</p>
-                    </div>
-                    <div className="text-center text-white">
-                        <p className="text-5xl md:text-6xl font-bold mb-2">500+</p>
-                        <p className="text-lg md:text-xl">Familias felices</p>
-                    </div>
-                    <div className="text-center text-white">
-                        <p className="text-5xl md:text-6xl font-bold mb-2">15+</p>
-                        <p className="text-lg md:text-xl">Proyectos completados</p>
-                    </div>
-                    <div className="text-center text-white">
-                        <p className="text-5xl md:text-6xl font-bold mb-2">100%</p>
-                        <p className="text-lg md:text-xl">Satisfacción garantizada</p>
-                    </div>
-                </div>
-            </div>
+            
 
             {/* Valores */}
             <div className="bg-white py-16 px-4">

@@ -1,14 +1,20 @@
-import portada from "../image/logo-lomas-country.jpg";
 import { BsCurrencyDollar, BsCardList } from "react-icons/bs";
 import { FiMapPin } from "react-icons/fi";
 import { IoHomeOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
+import portada from "../image/logo-lomas-country.jpg";
 
-export default function LoteamientoCard() {
+export default function LoteamientoCard({ fraccionamiento }) {
     // Función para formatear el precio
     const formatPrice = (price) => {
+        if (!price) return '0';
         return new Intl.NumberFormat('es-PY').format(price);
     };
+
+    // Si no hay fraccionamiento, no mostrar nada
+    if (!fraccionamiento) {
+        return null;
+    }
 
     return (
         <>
@@ -34,10 +40,10 @@ export default function LoteamientoCard() {
 
                 {/* Contenido de la card */}
                 <div className="p-6 space-y-6">
-                    {/* Título */}
+                    {/* Título - viene de la BD */}
                     <div className="text-center">
                         <h2 className="text-xl md:text-2xl font-bold text-gray-800 font-display leading-tight">
-                            Las Lomas Country
+                            {fraccionamiento.nombre || "Nombre no disponible"}
                         </h2>
                     </div>
 
@@ -48,7 +54,8 @@ export default function LoteamientoCard() {
                                 <FiMapPin className="w-5 h-5" />
                                 <span>Ubicación:</span>
                             </div>
-                            <span className="font-medium">Loma Grande</span>
+                            {/* Ubicación viene de la BD */}
+                            <span className="font-medium">{fraccionamiento.ubicacion || "Ubicación no disponible"}</span>
                         </div>
 
                         <div className="flex items-center gap-3 text-gray-700">
@@ -56,7 +63,8 @@ export default function LoteamientoCard() {
                                 <BsCardList className="w-5 h-5" />
                                 <span>Disponible:</span>
                             </div>
-                            <span className="font-medium">133 lotes</span>
+                            {/* Cantidad de lotes viene de la BD */}
+                            <span className="font-medium">{fraccionamiento.cantidad_lotes || 0} lotes</span>
                         </div>
                     </div>
 
@@ -68,8 +76,9 @@ export default function LoteamientoCard() {
                                 <span>Desde:</span>
                             </div>
                             <div className="text-right">
+                                {/* Precio viene de la BD */}
                                 <span className="text-2xl font-bold text-emerald-700">
-                                    {formatPrice("280000000")}
+                                    {formatPrice(fraccionamiento.precio_venta)}
                                 </span>
                                 <span className="text-emerald-600 text-lg font-medium ml-1">Gs</span>
                             </div>
@@ -77,7 +86,7 @@ export default function LoteamientoCard() {
                     </div>
                 </div>
 
-                {/* Botón de contacto mejorado */}
+                {/* Botón de contacto - lleva a /contacto como pediste */}
                 <div className="p-6 pt-0">
                     <Link to="/contacto" className="block w-full">
                         <button className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg group-hover:shadow-emerald-200">
@@ -93,4 +102,4 @@ export default function LoteamientoCard() {
             </div>
         </>
     );
-};
+}

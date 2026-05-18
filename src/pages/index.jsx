@@ -9,15 +9,24 @@ import NoticiasSection from "../components/NoticiasSection.jsx";
 export default function Index() {
     return(
         <>
-        
-            
             <div className="flex flex-col gap-24">
-                <Hero></Hero>
-                <LoteamientoList/>
+                {/* Hero - Primera sección */}
+                <Hero />
+
+                {/* Promoción */}
                 <PromocionSection />
-                <PropiedadesList/>
+
+                {/* Loteamiento */}
+                <LoteamientoList />
+
+                {/* Propiedades destacadas */}
+                <PropiedadesList />
+
+                {/* Noticias */}
                 <NoticiasSection />
-                <Foter></Foter>
+
+                {/* Footer */}
+                <Foter />
             </div>
         </>
     )

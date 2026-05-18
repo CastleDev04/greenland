@@ -29,6 +29,8 @@ import {
 
 const VentasList = ({ 
   ventas = [], 
+  onView,
+  onShowPayments,
   onEdit, 
   onDelete,
   loading = false 
@@ -275,12 +277,12 @@ const VentasList = ({
     const fechaProximoPago = venta.fecha_proximo_pago; // ← Atributo calculado del backend
     
     // Calcular progreso de cuotas
-    const progresoCalculado = venta.tipoPago === 'Credito' && venta.cantidadCuotas > 0
+    const progresoCalculado = venta.tipoPago === 'Financiado' && venta.cantidadCuotas > 0
       ? Math.round((cuotasPagadas / venta.cantidadCuotas) * 100)
       : venta.tipoPago === 'Contado' ? 100 : 0;
 
     // Calcular monto pendiente
-    const montoPagado = venta.tipoPago === 'Credito' 
+    const montoPagado = venta.tipoPago === 'Financiado' 
       ? (cuotasPagadas * (venta.montoCuota || 0))
       : venta.tipoPago === 'Contado' && cuotasPagadas > 0 ? venta.montoTotal : 0;
       
@@ -469,7 +471,7 @@ const VentasList = ({
             </div>
             
             {/* 🔥 CORRECCIÓN: Mostrar sección de crédito solo si es crédito */}
-            {venta.tipoPago === 'Credito' && (
+            {venta.tipoPago === 'Financiado' && (
               <div className="space-y-4">
                 <div className="bg-white p-4 rounded-lg">
                   <h3 className="font-medium text-gray-900 mb-2">Plan de Cuotas</h3>
@@ -1003,7 +1005,7 @@ const VentasList = ({
                     {getEstadoChip(venta.estado)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {venta.tipoPago === 'Credito' ? (
+                    {venta.tipoPago === 'Financiado' ? (
                       <div>
                         <div>{(venta.pagos?.length || 0)}/{venta.cantidadCuotas}</div>
                         <div className="text-xs text-gray-500">
@@ -1026,6 +1028,15 @@ const VentasList = ({
                       </button>
 
                       {/* 🔥 BOTÓN EDITAR - SIEMPRE VISIBLE */}
+                      {onShowPayments && (
+                        <button
+                          onClick={() => onShowPayments(venta)}
+                          className="text-purple-600 hover:text-purple-900 p-1 rounded hover:bg-purple-50 transition-colors"
+                          title="Mostrar pagos"
+                        >
+                          <CreditCard size={16} />
+                        </button>
+                      )}
                       {onEdit && (
                         <button
                           onClick={() => onEdit(venta)}

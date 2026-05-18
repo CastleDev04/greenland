@@ -93,10 +93,12 @@ export default function Navbar() {
 
                         {/* Icon section - Desktop */}
                         <div className="hidden lg:flex items-center gap-3">
+                            <Link to="/mis-pagos">
                             <button className="font-body flex bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white h-11 cursor-pointer rounded-lg justify-center text-base font-semibold gap-2 items-center px-4 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
                                 <LuCircleDollarSign className="text-xl" /> 
                                 Mis Pagos
                             </button>
+                            </Link>
                             <Link to="/login">
                                 <button className="font-body flex bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white h-11 cursor-pointer rounded-lg justify-center text-base font-semibold gap-2 items-center px-4 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105">
                                     <BsPersonCircle className="text-xl" /> 
@@ -170,10 +172,12 @@ export default function Navbar() {
 
                         {/* Botones de acción en mobile */}
                         <div className="mt-6 space-y-3 pt-6 border-t border-gray-200">
+                            <Link to="/mis-pagos" onClick={toggleMenu} className="block">
                             <button className="font-body flex w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white h-12 cursor-pointer rounded-lg justify-center text-lg font-semibold gap-2 items-center px-4 transition-all shadow-md">
                                 <LuCircleDollarSign className="text-xl" /> 
                                 Mis Pagos
                             </button>
+                            </Link>
                             <Link to="/login" onClick={toggleMenu} className="block">
                                 <button className="font-body flex w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white h-12 cursor-pointer rounded-lg justify-center text-lg font-semibold gap-2 items-center px-4 transition-all shadow-md">
                                     <BsPersonCircle className="text-xl" /> 

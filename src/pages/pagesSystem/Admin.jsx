@@ -1,16 +1,19 @@
+import { useNavigate } from 'react-router-dom';
 
-export default function Admin({ setCurrentSection }) {
+export default function Admin() {
+
+  const navigate = useNavigate();
 
   const navItems = [
-    { name: 'Gestión de Propiedades', key: 'propiedades' },
-    { name: 'Fraccionamiento', key: 'fraccionamiento' },
-    { name: 'Clientes', key: 'clientes' },
-    { name: 'Ventas', key: 'ventas' },
-    { name: 'Pagos y Financiamiento', key: 'pagos' },
-    { name: 'Reportes', key: 'reportes' },
-    { name: "Promociones", key: "promociones" },
-    { name: "Noticias", key: "noticias" },
-    { name: 'Usuarios', key: 'usuarios' },
+    { name: 'Gestión de Propiedades', path: '/system/' },
+    { name: 'Fraccionamiento', path: '/system/fraccionamiento' },
+    { name: 'Clientes', path: '/system/clientes' },
+    { name: 'Ventas', path: '/system/ventas' },
+    { name: 'Pagos y Financiamiento', path: '/system/pagos' },
+    { name: 'Reportes', path: '/system/reportes' },
+    { name: "Promociones", path: "/system/promociones" },
+    { name: "Noticias", path: "/system/noticias" },
+    { name: 'Usuarios', path: '/system/usuarios' },
   ];
 
   return (
@@ -21,9 +24,9 @@ export default function Admin({ setCurrentSection }) {
         <ul className="flex flex-col gap-10 space-x-6">
           {navItems.map(item => (
             <li
-              key={item.key}
+              key={item.path}
               className="hover:text-yellow-400 cursor-pointer"
-              onClick={() => setCurrentSection(item.key)}
+              onClick={() => navigate(item.path)}
             >
               {item.name}
             </li>

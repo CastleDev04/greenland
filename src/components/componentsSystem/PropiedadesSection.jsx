@@ -192,6 +192,7 @@ const PropiedadesSection = () => {
           <thead className="bg-gray-50 border-b">
             <tr>
               <th className="px-4 py-3 font-semibold text-gray-700">Fraccionamiento</th>
+              <th className="px-4 py-3 font-semibold text-gray-700">Loteamiento</th>
               <th className="px-4 py-3 font-semibold text-gray-700">Manzana</th>
               <th className="px-4 py-3 font-semibold text-gray-700">Lote</th>
               <th className="px-4 py-3 font-semibold text-gray-700">Precio</th>
@@ -203,6 +204,7 @@ const PropiedadesSection = () => {
             {propiedades.map((prop) => (
               <tr key={prop.id} className="border-b hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3 font-medium">{prop.fraccionamiento}</td>
+                <td className="px-4 py-3 font-medium">{prop.loteamiento}</td>
                 <td className="px-4 py-3">{prop.manzana}</td>
                 <td className="px-4 py-3">{prop.lote}</td>
                 <td className="px-4 py-3 font-semibold text-green-600">
